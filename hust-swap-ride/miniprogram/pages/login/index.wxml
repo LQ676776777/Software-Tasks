@@ -1,0 +1,7 @@
+<view class="wrap">
+  <text class="title">HUST Swap & Ride</text>
+  <input placeholder="学号邮箱（@hust.edu.cn）" bindinput="onEmail"/>
+  <input placeholder="验证码" maxlength="6" bindinput="onCode"/>
+  <button bindtap="sendCode">获取验证码</button>
+  <button bindtap="verify">登录 / 注册</button>
+</view>

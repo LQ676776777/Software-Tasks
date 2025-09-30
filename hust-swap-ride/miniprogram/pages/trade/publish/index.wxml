@@ -1,0 +1,7 @@
+<view class="wrap">
+  <input placeholder="标题" bindinput="onTitle"/>
+  <textarea placeholder="描述" bindinput="onDesc"></textarea>
+  <input type="number" placeholder="价格" bindinput="onPrice"/>
+  <button bindtap="chooseImgs">上传图片</button>
+  <button bindtap="submit">提交</button>
+</view>

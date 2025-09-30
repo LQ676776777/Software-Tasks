@@ -1,0 +1,4 @@
+<view class="wrap">
+  <button bindtap="toPublish">发布二手物品</button>
+  <button disabled>拼车信息（下一步）</button>
+</view>
