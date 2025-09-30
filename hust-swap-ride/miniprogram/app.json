@@ -1,16 +1,14 @@
 {
   "pages": [
-    "pages/index/index",
-    "pages/example/index"
+    "pages/login/index",
+    "pages/home/index",
+    "pages/trade/publish/index"
   ],
   "window": {
-    "backgroundColor": "#F6F6F6",
-    "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#F6F6F6",
-    "navigationBarTitleText": "云开发 QuickStart",
-    "navigationBarTextStyle": "black"
+    "navigationBarTitleText": "HUST Swap & Ride",
+    "navigationBarTextStyle": "black",
+    "navigationBarBackgroundColor": "#ffffff"
   },
-  "sitemapLocation": "sitemap.json",
   "style": "v2",
-  "lazyCodeLoading": "requiredComponents"
+  "sitemapLocation": "sitemap.json"
 }
