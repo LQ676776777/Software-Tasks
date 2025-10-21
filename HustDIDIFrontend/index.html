@@ -1,13 +1,174 @@
-
 <!doctype html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>校园拼车 | HUST</title>
-  </head>
-  <body class="bg-gray-50">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#2563eb" />
+  <meta name="description" content="HUST 校园拼车平台，方便同学结伴出行，安全高效又环保。" />
+  <meta name="keywords" content="拼车, 校园, HUST, 出行, 校园出行, 拼车平台" />
+
+  <title>HUST 校园拼车</title>
+
+  <!-- Favicon / App Icons（按需替换） -->
+  <link rel="icon" type="image/png" href="/logo.png" />
+  <link rel="apple-touch-icon" href="/logo.png" />
+
+  <!-- 字体（Inter） -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+
+  <!-- 首屏基础样式（背景、字体、Loading 动画） -->
+  <style>
+    :root {
+      --brand: #2563eb;
+      /* 主题蓝 */
+      --bg-start: #e0f2fe;
+      /* 渐变起点 */
+      --bg-end: #ffffff;
+      /* 渐变终点 */
+      --text: #1f2937;
+      /* 文本深灰 */
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-start: #0b1220;
+        --bg-end: #0b1220;
+        --text: #e5e7eb;
+      }
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: "Inter", "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, var(--bg-start), var(--bg-end)) fixed;
+      /* 内阴影让视觉更柔和 */
+      box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.04);
+    }
+
+    /* 首屏 Loading 的容器，覆盖整屏 */
+    #loading {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: transparent;
+      /* 与背景融合 */
+      z-index: 9999;
+      transition: opacity .3s ease;
+    }
+
+    #loading.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 20px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: saturate(150%) blur(8px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .loading-box {
+        background: rgba(20, 20, 28, 0.5);
+      }
+    }
+
+    .brand {
+      color: var(--brand);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    /* 纯 CSS 微动效的 spinner */
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2.5px solid rgba(37, 99, 235, 0.25);
+      border-top-color: var(--brand);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* 没开 JS 的兜底提示 */
+    noscript {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: #fff;
+      color: #111;
+      z-index: 10000;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 优雅首屏 Loading（React 挂载后自动隐藏） -->
+  <div id="loading" aria-live="polite">
+    <div class="loading-box">
+      <img src="/logo.png" alt="HUST 校园拼车 LOGO" width="56" height="56" style="border-radius: 12px" />
+      <div class="spinner" aria-hidden="true"></div>
+      <div class="brand">正在加载拼车平台…</div>
+    </div>
+  </div>
+
+  <!-- React 应用挂载点 -->
+  <div id="root"></div>
+
+  <!-- 无 JS 兜底 -->
+  <noscript>请开启 JavaScript 以使用本网站。</noscript>
+
+  <!-- 你的 React 入口（Vite） -->
+  <script type="module" src="/src/main.tsx"></script>
+
+  <!-- 自动隐藏 Loading：首个 React 节点挂载后移除 -->
+  <script>
+    (function () {
+      const root = document.getElementById('root');
+      const loading = document.getElementById('loading');
+      if (!root || !loading) return;
+
+      // 方案 A：首帧就尝试隐藏（适配快速机器）
+      requestAnimationFrame(() => {
+        if (root.childElementCount > 0) {
+          loading.classList.add('hidden');
+        }
+      });
+
+      // 方案 B：严格监听 React 挂载（MutationObserver 兜底）
+      const ob = new MutationObserver(() => {
+        if (root.childElementCount > 0) {
+          loading.classList.add('hidden');
+          setTimeout(() => {
+            loading.remove();
+            ob.disconnect();
+          }, 350);
+        }
+      });
+      ob.observe(root, { childList: true });
+    })();
+  </script>
+</body>
+
 </html>
