@@ -1,6 +1,7 @@
 package com.se.hustcar.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.se.hustcar.domain.dto.LoginFormDTO;
 import com.se.hustcar.domain.pojo.Result;
 import com.se.hustcar.domain.pojo.User;
@@ -42,12 +43,29 @@ public class UserServiceImpl implements UserService {
     @Override
     public Result register(User user) {
         userMapper.insert(user);
-        return Result.ok("用户注册成功");
+        return Result.ok("用户添加成功");
     }
 
     @Override
     public Result login(LoginFormDTO loginForm, HttpSession session) {
-        return null;
+        String phone = loginForm.getPhone();
+        String code = loginForm.getCode();
+        String sessionCode = (String) session.getAttribute("code");
+        if (sessionCode != null && sessionCode.equals(code)) {
+            //依据手机号查询是否存在用户
+            User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
+                    .eq(User::getPhoneNumber, phone));
+            if (user == null) {
+                user = new User();
+                user.setPhoneNumber(phone);
+                userMapper.insert(user);
+            }
+            //登录成功，保存用户信息到session
+            session.setAttribute("user", user);
+            return Result.ok("登录成功");
+        } else {
+            return Result.fail("验证错误");
+        }
     }
 
     @Override
@@ -62,7 +80,7 @@ public class UserServiceImpl implements UserService {
         //保存验证码到session
         session.setAttribute("code", code);
         //调用短信服务发送验证码
-        SmsSender.sendCodeUtil(code,phone);
+        //SmsSender.sendCodeUtil(code,phone);
         System.out.println("发送短信验证码，验证码："+code);
         //返回ok
         return Result.ok("验证码发送成功");
