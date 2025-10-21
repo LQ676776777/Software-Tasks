@@ -1,8 +1,12 @@
 package com.se.hustcar.controller;
 
+import com.se.hustcar.domain.dto.LoginFormDTO;
 import com.se.hustcar.domain.pojo.Result;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.se.hustcar.domain.pojo.User;
+import com.se.hustcar.service.UserService;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * ClassName: UserController
@@ -14,12 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class UserController {
-
-    //登录功能
-    @PostMapping
-    public Result login(){
-        return
-    }
+    @Autowired
+    UserService userService;
     // 用户信息修改
     @PutMapping("/user")
     public Result updateUserInfo(@RequestBody User user) {
@@ -32,7 +32,18 @@ public class UserController {
     }
     // 用户登录
     @PostMapping("/login")
-    public Result loginUser(@RequestBody LoginFormDTO loginForm) {
-        return userService.login(loginForm);
+    public Result login(@RequestBody LoginFormDTO loginForm, HttpSession session) {
+        return userService.login(loginForm,session);
     }
+    // 用户注册
+    @PostMapping("/user")
+    public Result registerUser(@RequestBody User user) {
+        return userService.register(user);
+    }
+    //发送验证码
+    @PostMapping("/code")
+    public Result sendCode(@RequestParam ("phone") String phone,HttpSession session) {
+        return userService.sendCode(phone,session);
+    }
+
 }
