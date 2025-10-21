@@ -1,50 +1,80 @@
+// src/pages/RideListPage.tsx
 
 import { useEffect, useState } from 'react'
 import { listRides } from '@/api/rides'
 import type { Ride } from '@/types'
 import RideCard from '@/components/RideCard'
+import PageHeader from '@/components/PageHeader'
+import { Car, Frown } from 'lucide-react' // 引入图标
 
 export default function RideListPage() {
   const [items, setItems] = useState<Ride[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
+  const [loading, setLoading] = useState(true) // 新增 loading 状态
+
+  const totalPages = Math.ceil(total / 10) || 1
 
   useEffect(() => {
     (async () => {
-      const { items, total } = await listRides({ page, size: 10 })
-      setItems(items); setTotal(total)
+      setLoading(true)
+      try {
+        const { items, total } = await listRides({ page, size: 10 })
+        setItems(items)
+        setTotal(total)
+      } catch (error) {
+        console.error("Failed to fetch rides:", error)
+        setItems([]) // 出错时清空列表
+      } finally {
+        setLoading(false)
+      }
     })()
   }, [page])
 
+  const renderPagination = () => (
+    <div className="fixed bottom-16 left-0 right-0 flex justify-center items-center gap-2 bg-white/80 backdrop-blur-sm border-t py-3 px-4">
+      <button
+        onClick={() => setPage(p => p - 1)}
+        disabled={page <= 1}
+        className="px-4 py-2 rounded-xl text-sm font-semibold transition bg-white text-emerald-600 ring-1 ring-emerald-400 hover:ring-emerald-500 active:ring-2 disabled:ring-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+      >
+        上一页
+      </button>
+      <span className="text-sm text-gray-600 font-medium">
+        第 {page} 页 / 共 {totalPages} 页
+      </span>
+      <button
+        onClick={() => setPage(p => p + 1)}
+        disabled={page >= totalPages}
+        className="px-4 py-2 rounded-xl text-sm font-semibold transition bg-white text-emerald-600 ring-1 ring-emerald-400 hover:ring-emerald-500 active:ring-2 disabled:ring-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+      >
+        下一页
+      </button>
+    </div>
+  )
+
   return (
-    <div className="space-y-4">
-      {/* 页面内容 */}
-      <div className="space-y-4 pb-28">   {/* 注意这里增加 pb-28 预留底部空间 */}
-        <h1 className="text-2xl font-bold text-gray-800">最新拼车</h1>
-        {items.length === 0 && <div className="text-center text-gray-500 py-8">暂无拼车单</div>}
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-6 pb-32">
+      {/* 2. 使用 PageHeader 组件替换原来的标题 */}
+      <PageHeader
+        icon={Car}
+        title="最新拼车"
+        subtitle="看看有没有同路的小伙伴"
+      />
+
+      {/* 列表内容 */}
+      <div className="space-y-4">
+        {loading && <div className="text-center text-gray-500 py-8">正在加载中...</div>}
+        {!loading && items.length === 0 && (
+          <div className="text-center text-gray-400 py-12 flex flex-col items-center gap-4">
+            <Frown className="w-16 h-16 text-gray-300" />
+            <span>暂时还没有拼车单哦</span>
+          </div>
+        )}
         {items.map(r => <RideCard key={r.id} ride={r} />)}
       </div>
 
-      {/* 固定分页按钮 */}
-      <div className="fixed bottom-16 left-0 right-0 flex justify-center gap-2 bg-gray-50 border-t py-3">
-        <button
-          className="px-4 py-2 rounded-lg border bg-white active:scale-95 transition"
-          onClick={() => setPage(p => Math.max(1, p - 1))}
-        >
-          上一页
-        </button>
-        <span className="text-sm self-center">
-          第 {page} 页 / 共 {Math.ceil(total / 10) || 1} 页
-        </span>
-        <button
-          className="px-4 py-2 rounded-lg border bg-white active:scale-95 transition"
-          onClick={() => setPage(p => p + 1)}
-          disabled={page * 10 >= total}
-        >
-          下一页
-        </button>
-      </div>
-
+      {total > 0 && renderPagination()}
     </div>
   )
 }

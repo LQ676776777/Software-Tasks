@@ -12,6 +12,7 @@ export interface Ride {
   status: RideStatus
   publisherId: number
   createdAt?: string
+  publisher: User
 }
 
 export interface User {
