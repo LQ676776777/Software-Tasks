@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.se</groupId>
-    <artifactId>HustCar</artifactId>
+    <artifactId>HustDIDIBackend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>HustCar</name>
     <description>HustCar</description>
