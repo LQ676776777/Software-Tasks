@@ -85,4 +85,10 @@ public class UserServiceImpl implements UserService {
         //返回ok
         return Result.ok("验证码发送成功");
     }
+
+    @Override
+    public Result logout(HttpSession session) {
+        session.invalidate();
+        return Result.ok("退出登录成功");
+    }
 }

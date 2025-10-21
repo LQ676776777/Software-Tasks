@@ -21,10 +21,6 @@ import java.util.List;
 public class CarPoolController {
     @Autowired
     CarpoolService carpoolService;
-    @GetMapping("/hello")
-    public Result queryTest(){
-        return Result.ok("hello");
-    }
     @GetMapping("/carpool")
     public Result queryCarpool(){
         return carpoolService.queryCarpool();
@@ -36,5 +32,9 @@ public class CarPoolController {
     @PostMapping("/carpool")
     public Result addCarpool(@RequestBody CarPool carPool) {
         return carpoolService.addCarpool(carPool);
+    }
+    @PutMapping("/carpool")
+    public Result updateCarpool(@RequestBody CarPool carPool) {
+        return carpoolService.updateCarpool(carPool);
     }
 }

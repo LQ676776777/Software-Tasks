@@ -20,4 +20,6 @@ public interface CarpoolService {
     Result queryCarpoolById(Integer id);
 
     Result addCarpool(CarPool carPool);
+
+    Result updateCarpool(CarPool carPool);
 }

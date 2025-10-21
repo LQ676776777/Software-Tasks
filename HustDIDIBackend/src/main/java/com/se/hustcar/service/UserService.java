@@ -24,4 +24,6 @@ public interface UserService {
     Result login(LoginFormDTO loginForm, HttpSession session);
 
     Result sendCode(String phone , HttpSession session);
+
+    Result logout(HttpSession session);
 }

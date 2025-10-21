@@ -42,4 +42,10 @@ public class CarpoolServiceImpl implements CarpoolService {
         carpoolMapper.insert(carPool);
         return Result.ok("拼车请求发布成功！");
     }
+
+    @Override
+    public Result updateCarpool(CarPool carPool) {
+        carpoolMapper.updateById(carPool);
+        return Result.ok("拼车请求更新成功！");
+    }
 }
