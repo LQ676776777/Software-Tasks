@@ -1,36 +1,24 @@
-
-import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
-import LoginPage from '@/pages/LoginPage'
-import RideListPage from '@/pages/RideListPage'
-import RideDetailPage from '@/pages/RideDetailPage'
-import PublishRidePage from '@/pages/PublishRidePage'
-import ProfilePage from '@/pages/ProfilePage'
-import SearchPage from '@/pages/SearchPage'
-import useAuth from '@/store/auth'
+// src/App.tsx
+import { Routes, Route, Navigate } from "react-router-dom"
+import LoginPage from "@/pages/LoginPage"
+import RideListPage from "@/pages/RideListPage"
+import RideDetailPage from "@/pages/RideDetailPage"
+import PublishRidePage from "@/pages/PublishRidePage"
+import ProfilePage from "@/pages/ProfilePage"
+import SearchPage from "@/pages/SearchPage"
+import useAuth from "@/store/auth"
+import BottomNav from "@/components/BottomNav"
 
 function RequireAuth({ children }: { children: JSX.Element }) {
   const { isAuthed } = useAuth()
-  const location = useLocation()
-  if (!isAuthed) {
-    return <Navigate to="/login" state={{ from: location }} replace />
-  }
-  return children
+  return isAuthed ? children : <Navigate to="/login" replace />
 }
 
 export default function App() {
   return (
-    <div className="min-h-screen">
-      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur border-b">
-        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link to="/" className="font-bold">校园拼车</Link>
-          <nav className="flex gap-4 text-sm">
-            <Link to="/search">搜索</Link>
-            <Link to="/publish">发布</Link>
-            <Link to="/profile">我的</Link>
-          </nav>
-        </div>
-      </header>
-      <main className="max-w-5xl mx-auto px-4 py-6">
+    <div className="min-h-screen bg-gray-50">
+      {/* 主内容区域：为底部导航预留空间 pb-24，并限制手机宽度 */}
+      <main className="mx-auto max-w-md px-4 pt-4 pb-24">
         <Routes>
           <Route path="/" element={<RideListPage />} />
           <Route path="/search" element={<SearchPage />} />
@@ -41,6 +29,9 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
+
+      {/* 固定底部导航 */}
+      <BottomNav />
     </div>
   )
 }
