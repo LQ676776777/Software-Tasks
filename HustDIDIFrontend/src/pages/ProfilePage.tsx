@@ -18,7 +18,7 @@ export default function ProfilePage() {
 
   return (
     <div className="max-w-lg mx-auto bg-white border rounded-2xl p-6 space-y-3">
-      <h1 className="text-xl font-bold">个人信息</h1>
+      <h1 className="text-2xl font-bold text-gray-800">个人信息</h1>
       <input className="w-full border rounded p-2" placeholder="昵称" value={form.nickname||''} onChange={e=>setForm({...form, nickname:e.target.value})}/>
       <input className="w-full border rounded p-2" placeholder="学院" value={form.faculty||''} onChange={e=>setForm({...form, faculty:e.target.value})}/>
       <div className="flex gap-2">

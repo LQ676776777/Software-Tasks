@@ -24,7 +24,7 @@ export default function SearchPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-bold">搜索拼车</h1>
+      <h1 className="text-2xl font-bold text-gray-800">搜索拼车</h1>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
         <input className="border rounded p-2" placeholder="出发地" value={origin} onChange={e=>setOrigin(e.target.value)} />
         <input className="border rounded p-2" placeholder="目的地" value={destination} onChange={e=>setDestination(e.target.value)} />

@@ -13,7 +13,7 @@ export default function RideDetailPage() {
     (async () => setRide(await getRide(Number(id))))()
   }, [id])
 
-  if (!ride) return <div>加载中...</div>
+  if (!ride) return <div className="text-gray-500">加载中...</div>
 
   return (
     <div className="bg-white border rounded-2xl p-6">

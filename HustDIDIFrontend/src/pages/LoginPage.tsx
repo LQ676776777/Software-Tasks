@@ -34,7 +34,7 @@ export default function LoginPage() {
 
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded-2xl border shadow-sm">
-      <h1 className="text-xl font-bold mb-4">手机验证码登录</h1>
+      <h1 className="text-xl font-bold mb-4 text-gray-800">手机验证码登录</h1>
       <div className="space-y-3">
         <input className="w-full border rounded p-2" placeholder="手机号" value={phone} onChange={e=>setPhone(e.target.value)} />
         <div className="flex gap-2">

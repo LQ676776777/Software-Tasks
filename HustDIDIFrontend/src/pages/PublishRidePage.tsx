@@ -15,7 +15,7 @@ export default function PublishRidePage() {
 
   return (
     <div className="max-w-lg mx-auto bg-white border rounded-2xl p-6 space-y-3">
-      <h1 className="text-xl font-bold">发布拼车单</h1>
+      <h1 className="text-2xl font-bold text-gray-800">发布拼车单</h1>
       <input className="w-full border rounded p-2" placeholder="出发地" value={form.origin} onChange={e=>setForm({...form, origin:e.target.value})}/>
       <input className="w-full border rounded p-2" placeholder="目的地" value={form.destination} onChange={e=>setForm({...form, destination:e.target.value})}/>
       <input className="w-full border rounded p-2" type="datetime-local" value={form.departureTime} onChange={e=>setForm({...form, departureTime:e.target.value})}/>

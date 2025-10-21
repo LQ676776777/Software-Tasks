@@ -20,7 +20,7 @@ export default function RideListPage() {
     <div className="space-y-4">
       {/* 页面内容 */}
       <div className="space-y-4 pb-28">   {/* 注意这里增加 pb-28 预留底部空间 */}
-        <h1 className="text-xl font-bold">最新拼车</h1>
+        <h1 className="text-2xl font-bold text-gray-800">最新拼车</h1>
         {items.length === 0 && <div className="text-center text-gray-500 py-8">暂无拼车单</div>}
         {items.map(r => <RideCard key={r.id} ride={r} />)}
       </div>
