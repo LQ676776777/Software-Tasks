@@ -1,4 +1,4 @@
-package com.se.hustcar.Config;
+package com.se.hustcar.config;
 
 import com.se.hustcar.interceptor.LoginInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDateTime;
 import java.util.List;
 @SpringBootTest
 class HustCarApplicationTests {
@@ -64,5 +65,29 @@ class HustCarApplicationTests {
         Page<CarPool> page = Page.of(pageNo, pageSize);
         carpoolService.page(page);
         System.out.println(page.getRecords());
+    }
+    //将数据库中的startplace和destination全部标准化进行更新
+    @Test
+    public void test7(){
+        List<CarPool> carPools = carpoolMapper.selectList(null);
+        for (CarPool carPool : carPools) {
+            String normalizedStart = com.se.hustcar.utils.PlaceNormalizer.normalize(carPool.getStartPlace());
+            String normalizedEnd = com.se.hustcar.utils.PlaceNormalizer.normalize(carPool.getDestination());
+            carPool.setNormalizedStartPlace(normalizedStart);
+            carPool.setNormalizedDestination(normalizedEnd);
+            carpoolMapper.updateById(carPool);
+        }
+    }
+    //插入一条测试数据，看看标准化是否生效
+    @Test
+    public void test8(){
+        CarPool carPool = new CarPool();
+        carPool.setUserId(1L);
+        carPool.setStartPlace("华中科技大学东校区火车站");
+        carPool.setDestination("武汉大学南门");
+        //设置时间,localfatetime
+        carPool.setDateTime(LocalDateTime.now());
+        carPool.setState(1);
+        carpoolMapper.insert(carPool);
     }
 }

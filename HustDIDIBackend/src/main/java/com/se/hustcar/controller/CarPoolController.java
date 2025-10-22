@@ -49,9 +49,17 @@ public class CarPoolController {
     @GetMapping("/carpool/page")
     public Result queryCarpoolByPage(@RequestParam("current") int current) {
         Page<CarPool> page = carpoolService.query().page(new Page<>(current, DEFAULT_PAGE_SIZE));
-        return Result.ok(page.getRecords());
+        return Result.ok(page.getRecords(),page.getTotal());
     }
-    @GetMapping("/carpool/matching")
+
+    /**
+     * 根据起点和终点模糊查询拼车信息
+     * @param startLocation
+     * @param endLocation
+     * @param current
+     * @return
+     */
+/*    @GetMapping("/carpool/matching")
     public Result queryMatchingCarpool(@RequestParam("startLocation") String startLocation,
                                        @RequestParam("endLocation") String endLocation,
                                        @RequestParam("current") int current) {
@@ -60,5 +68,11 @@ public class CarPoolController {
                 .like("destination", endLocation)
                 .page(new Page<>(current, DEFAULT_PAGE_SIZE));
         return Result.ok(page.getRecords());
+    }*/
+    @GetMapping("/carpool/matching")
+    public Result queryMatchingCarpool(@RequestParam("startLocation") String startLocation,
+                                       @RequestParam("endLocation") String endLocation,
+                                       @RequestParam("current") int current) {
+        return carpoolService.queryCarpoolByMatching(startLocation, endLocation, current);
     }
 }

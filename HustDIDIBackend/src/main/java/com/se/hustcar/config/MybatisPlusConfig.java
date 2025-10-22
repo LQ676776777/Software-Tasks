@@ -1,4 +1,4 @@
-package com.se.hustcar.Config;
+package com.se.hustcar.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;

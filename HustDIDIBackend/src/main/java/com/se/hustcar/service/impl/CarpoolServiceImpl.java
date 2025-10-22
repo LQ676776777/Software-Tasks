@@ -1,16 +1,20 @@
 package com.se.hustcar.service.impl;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.se.hustcar.domain.pojo.CarPool;
 import com.se.hustcar.domain.pojo.Result;
 import com.se.hustcar.domain.pojo.User;
 import com.se.hustcar.mapper.CarpoolMapper;
 import com.se.hustcar.service.CarpoolService;
+import com.se.hustcar.utils.PlaceNormalizer;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static com.se.hustcar.constants.SystemConstants.DEFAULT_PAGE_SIZE;
 
 /**
  * ClassName: CarpoolServiceImpl
@@ -54,6 +58,19 @@ public class CarpoolServiceImpl extends ServiceImpl<CarpoolMapper,CarPool> imple
     public Result updateCarpool(CarPool carPool) {
         carpoolMapper.updateById(carPool);
         return Result.ok("拼车请求更新成功！");
+    }
+
+    @Override
+    public Result queryCarpoolByMatching(String startLocation, String endLocation, int current) {
+        String normalizedStart = PlaceNormalizer.normalize(startLocation);
+        String normalizedEnd = PlaceNormalizer.normalize(endLocation);
+
+        Page<CarPool> page = this.query()
+                .like("normalized_start_place", normalizedStart)
+                .like("normalized_destination", normalizedEnd)
+                .page(new Page<>(current, DEFAULT_PAGE_SIZE));
+
+        return Result.ok(page.getRecords());
     }
 
 }
