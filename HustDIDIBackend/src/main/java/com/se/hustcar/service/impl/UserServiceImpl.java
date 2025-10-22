@@ -1,17 +1,17 @@
 package com.se.hustcar.service.impl;
 
+import cn.hutool.core.util.PhoneUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.se.hustcar.domain.dto.LoginFormDTO;
 import com.se.hustcar.domain.pojo.Result;
 import com.se.hustcar.domain.pojo.User;
 import com.se.hustcar.mapper.UserMapper;
 import com.se.hustcar.service.UserService;
-import com.se.hustcar.utils.SmsSender;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import cn.hutool.core.util.PhoneUtil;
 /**
  * ClassName: UserServiceImpl
  * Description:
@@ -21,7 +21,7 @@ import cn.hutool.core.util.PhoneUtil;
  * @Veision 1.0
  */
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements UserService {
     @Autowired
     UserMapper userMapper;
     @Override
@@ -79,6 +79,8 @@ public class UserServiceImpl implements UserService {
         String code= RandomUtil.randomNumbers(6);// 生成6位随机数字验证码
         //保存验证码到session
         session.setAttribute("code", code);
+        //设置有效期为5分钟
+        session.setMaxInactiveInterval(5 * 60);
         //调用短信服务发送验证码
         //SmsSender.sendCodeUtil(code,phone);
         System.out.println("发送短信验证码，验证码："+code);

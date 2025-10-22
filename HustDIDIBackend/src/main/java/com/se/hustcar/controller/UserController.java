@@ -35,14 +35,14 @@ public class UserController {
     public Result login(@RequestBody LoginFormDTO loginForm, HttpSession session) {
         return userService.login(loginForm,session);
     }
-    //退出登录
-    @PostMapping("/logout")
-    public Result logout(HttpSession session) {
-        return userService.logout(session);
-    }
     //发送验证码
     @PostMapping("/code")
     public Result sendCode(@RequestParam ("phone") String phone,HttpSession session) {
         return userService.sendCode(phone, session);
+    }
+    //退出登录
+    @PostMapping("/logout")
+    public Result logout(HttpSession session) {
+        return userService.logout(session);
     }
 }

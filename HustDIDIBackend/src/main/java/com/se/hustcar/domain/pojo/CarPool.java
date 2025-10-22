@@ -19,7 +19,7 @@ public class CarPool {
     @TableId(value = "trade_id")
     private Long id;
     private LocalDateTime dateTime;
-    private Integer userId;
+    private Long userId;
     private String startPlace;
     private String destination;
     private Integer state;

@@ -1,13 +1,14 @@
 package com.se.hustcar.controller;
 
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.se.hustcar.domain.pojo.CarPool;
 import com.se.hustcar.domain.pojo.Result;
 import com.se.hustcar.service.CarpoolService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 /**
  * ClassName: QueryCarController
@@ -26,15 +27,26 @@ public class CarPoolController {
         return carpoolService.queryCarpool();
     }
     @GetMapping("/carpool/{id}")
-    public Result queryCarpoolById(@PathVariable Integer id){
-        return carpoolService.queryCarpoolById(id);
-    }
+    public Result queryCarpoolById(@PathVariable Integer id){return carpoolService.queryCarpoolById(id);}
+    //发布拼车信息
     @PostMapping("/carpool")
-    public Result addCarpool(@RequestBody CarPool carPool) {
-        return carpoolService.addCarpool(carPool);
-    }
+    public Result addCarpool(@RequestBody CarPool carPool, HttpSession session) {return carpoolService.addCarpool(carPool,session);}
+
+    /**
+     * 更新拼车信息
+     * @param carPool
+     * @return
+     */
     @PutMapping("/carpool")
     public Result updateCarpool(@RequestBody CarPool carPool) {
         return carpoolService.updateCarpool(carPool);
+    }
+    /**
+     * 分页查询拼车信息
+     */
+    @GetMapping("/page")
+    public Result queryCarpoolByPage(@RequestParam("current") int current) {
+        Page<CarPool> page = carpoolService.query().page(new Page<>(current, 2));
+        return Result.ok(page.getRecords());
     }
 }

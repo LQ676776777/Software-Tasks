@@ -1,9 +1,12 @@
 package com.se.hustcar.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.se.hustcar.domain.pojo.CarPool;
 import com.se.hustcar.domain.pojo.Result;
+import com.se.hustcar.domain.pojo.User;
 import com.se.hustcar.mapper.CarpoolMapper;
 import com.se.hustcar.service.CarpoolService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +21,7 @@ import java.util.List;
  * @Veision 1.0
  */
 @Service
-public class CarpoolServiceImpl implements CarpoolService {
+public class CarpoolServiceImpl extends ServiceImpl<CarpoolMapper,CarPool> implements CarpoolService {
     @Autowired
     CarpoolMapper carpoolMapper;
 
@@ -38,7 +41,11 @@ public class CarpoolServiceImpl implements CarpoolService {
     }
 
     @Override
-    public Result addCarpool(CarPool carPool) {
+    public Result addCarpool(CarPool carPool, HttpSession session) {
+        // 从session中获取当前用户信息
+        User user = (User) session.getAttribute("user");
+        Long id = user.getId();
+        carPool.setUserId(id);
         carpoolMapper.insert(carPool);
         return Result.ok("拼车请求发布成功！");
     }

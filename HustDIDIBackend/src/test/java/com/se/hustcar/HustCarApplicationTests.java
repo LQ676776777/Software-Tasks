@@ -1,12 +1,14 @@
 package com.se.hustcar;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.se.hustcar.domain.pojo.CarPool;
 import com.se.hustcar.domain.pojo.User;
 import com.se.hustcar.mapper.CarpoolMapper;
 import com.se.hustcar.mapper.UserMapper;
+import com.se.hustcar.service.CarpoolService;
+import com.se.hustcar.service.UserService;
 import org.junit.jupiter.api.Test;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -17,6 +19,10 @@ class HustCarApplicationTests {
     private CarpoolMapper carpoolMapper;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private CarpoolService carpoolService;
+    @Autowired
+    private UserService userService;
     @Test
     void contextLoads() {
     }
@@ -49,5 +55,14 @@ class HustCarApplicationTests {
         User user = new User();
         user.setPhoneNumber("13849098687");
         userMapper.insert(user);
+    }
+    //分页查询
+    @Test
+    public void test6(){
+        int pageNo = 2;
+        int pageSize = 2;
+        Page<CarPool> page = Page.of(pageNo, pageSize);
+        Page<CarPool> page1 = carpoolService.page(page);
+        System.out.println(page1.getRecords());
     }
 }
