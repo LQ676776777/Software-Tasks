@@ -62,7 +62,7 @@ class HustCarApplicationTests {
         int pageNo = 2;
         int pageSize = 2;
         Page<CarPool> page = Page.of(pageNo, pageSize);
-        Page<CarPool> page1 = carpoolService.page(page);
-        System.out.println(page1.getRecords());
+        carpoolService.page(page);
+        System.out.println(page.getRecords());
     }
 }

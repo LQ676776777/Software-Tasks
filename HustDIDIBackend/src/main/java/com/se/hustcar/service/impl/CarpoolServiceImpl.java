@@ -55,4 +55,5 @@ public class CarpoolServiceImpl extends ServiceImpl<CarpoolMapper,CarPool> imple
         carpoolMapper.updateById(carPool);
         return Result.ok("拼车请求更新成功！");
     }
+
 }

@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import static com.se.hustcar.constants.SystemConstants.DEFAULT_PAGE_SIZE;
+
 
 /**
  * ClassName: QueryCarController
@@ -44,9 +46,19 @@ public class CarPoolController {
     /**
      * 分页查询拼车信息
      */
-    @GetMapping("/page")
+    @GetMapping("/carpool/page")
     public Result queryCarpoolByPage(@RequestParam("current") int current) {
-        Page<CarPool> page = carpoolService.query().page(new Page<>(current, 2));
+        Page<CarPool> page = carpoolService.query().page(new Page<>(current, DEFAULT_PAGE_SIZE));
+        return Result.ok(page.getRecords());
+    }
+    @GetMapping("/carpool/matching")
+    public Result queryMatchingCarpool(@RequestParam("startLocation") String startLocation,
+                                       @RequestParam("endLocation") String endLocation,
+                                       @RequestParam("current") int current) {
+        Page<CarPool> page = carpoolService.query()
+                .like("start_place", startLocation)
+                .like("destination", endLocation)
+                .page(new Page<>(current, DEFAULT_PAGE_SIZE));
         return Result.ok(page.getRecords());
     }
 }
