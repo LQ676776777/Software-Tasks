@@ -7,13 +7,27 @@ import com.se.hustcar.domain.pojo.User;
 import com.se.hustcar.mapper.CarpoolMapper;
 import com.se.hustcar.mapper.UserMapper;
 import com.se.hustcar.service.CarpoolService;
-import com.se.hustcar.service.UserService;
+import org.apache.http.HttpHost;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.GetIndexRequest;
+import org.elasticsearch.client.indices.GetIndexResponse;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+
 @SpringBootTest
 class HustCarApplicationTests {
     @Autowired
@@ -22,8 +36,45 @@ class HustCarApplicationTests {
     private UserMapper userMapper;
     @Autowired
     private CarpoolService carpoolService;
-    @Autowired
-    private UserService userService;
+
+    /**
+     * 测试es的连接
+     */
+    @Test
+    public void test9() throws IOException {
+        RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(
+                new HttpHost("localhost", 9200, "http")
+        ));
+        GetIndexRequest carpool = new GetIndexRequest("carpool");
+        GetIndexResponse response = client.indices().get(carpool, RequestOptions.DEFAULT);
+        System.out.println(response.getAliases());
+        System.out.println(response.getMappings());
+        System.out.println(response.getSettings());
+        client.close();
+    }
+    @Test
+    public void test10() throws IOException {
+        RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(
+                new HttpHost("localhost", 9200, "http")
+        ));
+        SearchRequest request = new SearchRequest();
+        request.indices("carpool");
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder().query(QueryBuilders.matchAllQuery());
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        boolQueryBuilder.must(QueryBuilders.matchQuery("start_place","华科"));
+        boolQueryBuilder.must(QueryBuilders.rangeQuery("date_time").gt(LocalDateTime.now()));
+        sourceBuilder.query(boolQueryBuilder);
+        request.source(sourceBuilder);
+        SearchResponse response = client.search(request, RequestOptions.DEFAULT);
+
+        System.out.println(response.getHits().getHits());
+        System.out.println(response.getHits().getTotalHits());
+        SearchHits hits = response.getHits();
+        for (SearchHit searchHit : hits){
+            System.out.println(searchHit.getSourceAsString());
+        }
+        client.close();
+    }
     @Test
     void contextLoads() {
     }
