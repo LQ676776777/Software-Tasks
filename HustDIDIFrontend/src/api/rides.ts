@@ -22,7 +22,6 @@ export async function listRides(q: RideQuery) {
 }
 
 export async function getRide(id: number) {
-  // 修改点: 告诉 client.get 我们期望返回的 data 是 Ride 类型
   const data = await client.get<Ride>(`/carpool/${id}`)
   return data // 现在 data 的类型就是 Ride，不再需要 as Ride
 }

@@ -23,10 +23,10 @@ export default function App() {
           <Route path="/" element={<RideListPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/rides/:id" element={<RideDetailPage />} />
-          {/* <Route path="/publish" element={<RequireAuth><PublishRidePage /></RequireAuth>} />
-          <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} /> */}
-          <Route path="/publish" element={<PublishRidePage />} />
-          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/publish" element={<RequireAuth><PublishRidePage /></RequireAuth>} />
+          <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
+          {/* <Route path="/publish" element={<PublishRidePage />} />
+          <Route path="/profile" element={<ProfilePage />} /> */}
 
 
           <Route path="/login" element={<LoginPage />} />
