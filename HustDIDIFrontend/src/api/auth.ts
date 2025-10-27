@@ -27,12 +27,18 @@ export async function loginWithCode(phone: string, code: string) {
 }
 
 
+// 根据当前后端约定，没有单独的 `/user/me` 接口。
+// 如果需要获取当前登录用户信息，可以考虑在登录成功后从返回的 cookie/session 中获取，或在持久层中存储。
+// 因此这里的 getProfile 返回 undefined。
 export async function getProfile() {
-  const data = await client.get('/user/me')
-  return data
+  // 占位实现：后端暂未提供获取当前用户信息的接口
+  return undefined
 }
 
+/**
+ * 更新用户信息。后端通过 PUT /user 接收 User 对象进行更新。
+ */
 export async function updateProfile(payload: any) {
-  const data = await client.put('/user/me', payload)
-  return data
+  const res = await client.put('/user', payload) as any
+  return res.data
 }
