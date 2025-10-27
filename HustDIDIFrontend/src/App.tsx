@@ -22,7 +22,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<RideListPage />} />
           <Route path="/search" element={<SearchPage />} />
-          <Route path="/rides/:id" element={<RideDetailPage />} />
+          {/* 详情页路径修改为 /carpool/:id，对应后端的 carpool 查询 */}
+          <Route path="/carpool/:id" element={<RideDetailPage />} />
           <Route path="/publish" element={<RequireAuth><PublishRidePage /></RequireAuth>} />
           <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
           {/* <Route path="/publish" element={<PublishRidePage />} />
