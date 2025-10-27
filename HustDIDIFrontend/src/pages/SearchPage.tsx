@@ -1,20 +1,22 @@
 // src/pages/SearchPage.tsx
 
 import { useEffect, useMemo, useState } from 'react'
-import { listRides } from '@/api/rides'
+import { searchRides } from '@/api/rides'
 import RideCard from '@/components/RideCard'
-import type { Ride } from '@/types'
-import { Search, Frown } from 'lucide-react'
+import type { CarPool } from '@/types'
+import { Search as SearchIcon, Frown } from 'lucide-react'
 
 export default function SearchPage() {
-  const [query, setQuery] = useState({ origin: '', destination: '', date: '', keyword: '' })
-  const [items, setItems] = useState<Ride[]>([])
+  // 仅支持输入出发地和目的地两项，后端根据 startLocation/endLocation 模糊匹配
+  const [query, setQuery] = useState({ startLocation: '', endLocation: '' })
+  const [items, setItems] = useState<CarPool[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(false)
   const [hasSearched, setHasSearched] = useState(false) // 跟踪是否已执行过搜索
 
-  const debouncedQuery = useMemo(() => ({ ...query, page, size: 10 }), [query, page])
+  // 每当查询条件或页码变化时重新搜索
+  const debouncedQuery = useMemo(() => ({ ...query, current: page }), [query, page])
 
   useEffect(() => {
     // 仅当用户输入了内容才开始搜索
@@ -31,7 +33,12 @@ export default function SearchPage() {
     const handler = setTimeout(() => {
       (async () => {
         try {
-          const { items, total } = await listRides(debouncedQuery)
+          // 调用新的搜索接口，根据起止地点模糊匹配
+          const { items, total } = await searchRides({
+            startLocation: debouncedQuery.startLocation,
+            endLocation: debouncedQuery.endLocation,
+            current: debouncedQuery.current
+          })
           setItems(items)
           setTotal(total)
         } catch (e) {
@@ -50,13 +57,13 @@ export default function SearchPage() {
     setPage(1) // 任何搜索条件变化时，重置到第一页
   }
 
-  const renderInput = (label: string, field: keyof typeof query, type = 'text') => (
+  const renderInput = (label: string, field: keyof typeof query) => (
     <div className="group">
       <label className="block text-sm text-gray-400 mb-1 group-focus-within:text-emerald-600 transition-colors">{label}</label>
       <div className="border-b border-gray-200 focus-within:border-emerald-500 transition-all">
         <input
           className="w-full bg-transparent outline-none text-base text-gray-900 caret-emerald-500 py-2"
-          type={type}
+          type="text"
           value={query[field]}
           onChange={e => handleInputChange(field, e.target.value)}
         />
@@ -70,7 +77,7 @@ export default function SearchPage() {
       <div className="bg-white rounded-3xl shadow-lg p-6 sm:p-8 mb-6">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
-            <Search className="w-7 h-7 text-emerald-600" />
+            <SearchIcon className="w-7 h-7 text-emerald-600" />
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">精确查找</h1>
@@ -78,10 +85,8 @@ export default function SearchPage() {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-          {renderInput('出发地', 'origin')}
-          {renderInput('目的地', 'destination')}
-          {renderInput('出发日期', 'date', 'date')}
-          {renderInput('关键词（如备注）', 'keyword')}
+          {renderInput('出发地', 'startLocation')}
+          {renderInput('目的地', 'endLocation')}
         </div>
       </div>
 
@@ -108,7 +113,7 @@ export default function SearchPage() {
 
         {!hasSearched && !loading && (
            <div className="text-center text-gray-400 py-12 flex flex-col items-center gap-4">
-            <Search className="w-16 h-16 text-gray-300" />
+            <SearchIcon className="w-16 h-16 text-gray-300" />
             <span>输入条件开始搜索吧！</span>
           </div>
         )}

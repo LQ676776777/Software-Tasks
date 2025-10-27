@@ -6,28 +6,28 @@ import { useNavigate } from 'react-router-dom'
 import { PenSquare, Send } from 'lucide-react'
 
 export default function PublishRidePage() {
+  // 表单字段与后端 CarPool 一致：startPlace, destination, dateTime
   const [form, setForm] = useState({
-    origin: '',
+    startPlace: '',
     destination: '',
-    departureTime: '',
-    seats: 1,
-    note: ''
+    dateTime: ''
   })
   const [loading, setLoading] = useState(false)
   const nav = useNavigate()
 
-  const handleInputChange = (field: keyof typeof form, value: string | number) => {
+  const handleInputChange = (field: keyof typeof form, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }))
   }
 
   const submit = async () => {
     // 简单的前端校验
-    if (!form.origin || !form.destination || !form.departureTime) {
-      return alert('请填写完整的出发地、目的地和出发时间')
+    if (!form.startPlace || !form.destination || !form.dateTime) {
+      alert('请填写完整的出发地、目的地和出发时间')
+      return
     }
     setLoading(true)
     try {
-      await createRide(form as any) // as any for simplicity, better define type
+      await createRide(form) // 与后端模型一致
       alert('发布成功！')
       nav('/') // 发布成功后跳转到首页
     } catch (e: any) {
@@ -37,17 +37,18 @@ export default function PublishRidePage() {
     }
   }
 
-  const renderInput = (label: string, placeholder: string, field: keyof typeof form, type = 'text') => (
+  const renderInput = (label: string, placeholder: string, field: keyof typeof form, type: string = 'text') => (
     <div className="group">
-      <label className="block text-sm sm:text-base text-gray-400 mb-2 group-focus-within:text-emerald-600 transition-colors">{label}</label>
+      <label className="block text-sm sm:text-base text-gray-400 mb-2 group-focus-within:text-emerald-600 transition-colors">
+        {label}
+      </label>
       <div className="border-b border-gray-300 focus-within:border-emerald-500 focus-within:shadow-[0_1px_0_0_rgba(16,185,129,0.8)] transition-all">
         <input
           className="w-full bg-transparent outline-none text-base sm:text-lg text-gray-900 placeholder:text-gray-400 caret-emerald-500 selection:bg-emerald-100 py-2"
           type={type}
           placeholder={placeholder}
           value={form[field] as string}
-          onChange={e => handleInputChange(field, type === 'number' ? Number(e.target.value) : e.target.value)}
-          min={type === 'number' ? 1 : undefined}
+          onChange={e => handleInputChange(field, e.target.value)}
         />
       </div>
     </div>
@@ -68,22 +69,9 @@ export default function PublishRidePage() {
         </div>
 
         <div className="space-y-6">
-          {renderInput('出发地', '例如：东区食堂', 'origin')}
+          {renderInput('出发地', '例如：东区食堂', 'startPlace')}
           {renderInput('目的地', '例如：光谷广场', 'destination')}
-          {renderInput('出发时间', '', 'departureTime', 'datetime-local')}
-          {renderInput('座位数', '提供几个座位', 'seats', 'number')}
-          
-          <div className="group">
-            <label className="block text-sm sm:text-base text-gray-400 mb-2 group-focus-within:text-emerald-600 transition-colors">备注（可选）</label>
-            <div className="border-b border-gray-300 focus-within:border-emerald-500 focus-within:shadow-[0_1px_0_0_rgba(16,185,129,0.8)] transition-all">
-              <textarea
-                className="w-full bg-transparent outline-none text-base sm:text-lg text-gray-900 placeholder:text-gray-400 caret-emerald-500 selection:bg-emerald-100 py-2 resize-none h-20"
-                placeholder="例如：仅限女生，无大件行李"
-                value={form.note}
-                onChange={e => handleInputChange('note', e.target.value)}
-              />
-            </div>
-          </div>
+          {renderInput('出发时间', '', 'dateTime', 'datetime-local')}
         </div>
 
         <div className="pt-4">
