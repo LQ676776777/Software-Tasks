@@ -1,39 +1,57 @@
 // src/api/rides.ts
 
 import client from './client'
-import type { Ride, RideStatus } from '@/types'
+import type { CarPool } from '@/types'
 import { normalizePageData } from './result'
 
-export interface RideQuery {
-  origin?: string
-  destination?: string
-  date?: string // yyyy-MM-dd
-  page?: number
-  size?: number
-  keyword?: string
-}
-
-export async function listRides(q: RideQuery) {
-  // 对于 listRides，你的 normalizePageData 已经处理得很好，通常不需要改动。
-  // 但为了风格统一，也可以加上类型提示。
-  const data = await client.get('/carpool/list', { params: q })
-  const { total, items } = normalizePageData<Ride>(data)
+/**
+ * 分页查询所有拼车信息。
+ * @param q current 表示页码（从 1 开始）
+ */
+export async function listRides(q: { current?: number } = {}) {
+  const current = q.current ?? 1
+  // 调用后端分页接口：/carpool/page?current=1
+  const res = await client.get('/carpool/page', { params: { current } }) as any
+  // 返回的对象形如 { success, data: CarPool[], total }
+  const { total, items } = normalizePageData<CarPool>(res)
   return { total, items }
 }
 
+/**
+ * 根据起止地点查询拼车信息（模糊匹配）。
+ * 后端接口为 /carpool/matching?startLocation=xxx&endLocation=yyy&current=1
+ */
+export async function searchRides(q: { startLocation: string; endLocation: string; current?: number }) {
+  const { startLocation, endLocation } = q
+  const current = q.current ?? 1
+  const res = await client.get('/carpool/matching', { params: { startLocation, endLocation, current } }) as any
+  // matching 接口返回的 payload 可能不带 total，normalizePageData 会自动计算 total
+  const { total, items } = normalizePageData<CarPool>(res)
+  return { total, items }
+}
+
+/**
+ * 根据 ID 获取拼车详情。
+ */
 export async function getRide(id: number) {
-  const data = await client.get<Ride>(`/carpool/${id}`)
-  return data // 现在 data 的类型就是 Ride，不再需要 as Ride
+  const res = await client.get(`/carpool/${id}`) as any
+  // 响应 payload 为 { success, data: CarPool }
+  return res.data as CarPool
 }
 
-export async function createRide(payload: Partial<Ride>) {
-  // 修改点: 告诉 client.post 我们期望返回的 data 是 Ride 类型
-  const data = await client.post<Ride>('/carpool', payload)
-  return data // 类型正确，无需转换
+/**
+ * 发布新的拼车信息。
+ * payload 只需包含 startPlace、destination、dateTime 等字段，userId 由后端从 session 中获取。
+ */
+export async function createRide(payload: Partial<CarPool>) {
+  const res = await client.post('/carpool', payload) as any
+  return res.data
 }
 
-export async function updateRideStatus(id: number, status: RideStatus) {
-  // 修改点: 告诉 client.put 我们期望返回的 data 是 Ride 类型
-  const data = await client.put<Ride>(`/carpool/${id}/status`, { status })
-  return data // 类型正确，无需转换
+/**
+ * 更新拼车信息（包括状态）。
+ */
+export async function updateRide(payload: Partial<CarPool>) {
+  const res = await client.put('/carpool', payload) as any
+  return res.data
 }

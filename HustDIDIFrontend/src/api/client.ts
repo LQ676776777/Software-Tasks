@@ -23,15 +23,19 @@ client.interceptors.request.use((cfg) => {
 // ============= 响应拦截器 =============
 client.interceptors.response.use(
   (res) => {
-    // 后端返回 Result 格式 { code, msg, data }
+    /**
+     * 后端统一返回 { success, errorMsg, data, total } 结构。
+     * 在此统一判断并返回整个 payload，方便调用方同时获取 data 和 total。
+     */
     const payload = res.data as Result<any>
-    if (payload && typeof payload === 'object' && 'data' in payload) {
-      if (isOk(payload)) return payload.data
+    if (payload && typeof payload === 'object' && 'success' in payload) {
+      if (isOk(payload)) {
+        return payload
+      }
       const msg = getMessage(payload) || '请求失败'
       return Promise.reject(new Error(msg))
     }
-
-    // 如果后端没包装，直接返回 data
+    // 如果后端没有包装 Result，直接返回原始 data
     return res.data
   },
   (err) => {
