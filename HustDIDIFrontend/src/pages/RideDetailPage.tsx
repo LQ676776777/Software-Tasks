@@ -119,4 +119,6 @@ export default function RideDetailPage() {
       </div>
     </div>
   )
+
+
 }
