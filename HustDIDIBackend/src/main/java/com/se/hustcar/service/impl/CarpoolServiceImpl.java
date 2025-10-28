@@ -1,5 +1,6 @@
 package com.se.hustcar.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.se.hustcar.domain.pojo.CarPool;
@@ -31,7 +32,10 @@ public class CarpoolServiceImpl extends ServiceImpl<CarpoolMapper,CarPool> imple
 
     @Override
     public Result queryCarpool() {
-        List<CarPool> carpoolList = carpoolMapper.selectList(null);
+        //查询状态为有效的拼车请求
+        QueryWrapper<CarPool> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("state", 0);
+        List<CarPool> carpoolList = carpoolMapper.selectList(queryWrapper);
         return Result.ok(carpoolList, (long) carpoolList.size());
     }
 
@@ -50,6 +54,7 @@ public class CarpoolServiceImpl extends ServiceImpl<CarpoolMapper,CarPool> imple
         User user = (User) session.getAttribute("user");
         Long id = user.getId();
         carPool.setUserId(id);
+        carPool.setState(0);
         carpoolMapper.insert(carPool);
         return Result.ok("拼车请求发布成功！");
     }

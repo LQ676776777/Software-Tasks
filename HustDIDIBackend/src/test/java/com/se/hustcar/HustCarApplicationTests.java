@@ -3,6 +3,7 @@ package com.se.hustcar;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.se.hustcar.domain.pojo.CarPool;
+import com.se.hustcar.domain.pojo.Result;
 import com.se.hustcar.domain.pojo.User;
 import com.se.hustcar.mapper.CarpoolMapper;
 import com.se.hustcar.mapper.UserMapper;
@@ -37,6 +38,11 @@ class HustCarApplicationTests {
     @Autowired
     private CarpoolService carpoolService;
 
+    @Test
+    public void test11(){
+        Result result = carpoolService.queryCarpool();
+        System.out.println(result);
+    }
     /**
      * 测试es的连接
      */

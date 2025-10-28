@@ -1,6 +1,7 @@
 package com.se.hustcar.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.se.hustcar.domain.pojo.CarPool;
 import com.se.hustcar.domain.pojo.Result;
@@ -48,7 +49,10 @@ public class CarPoolController {
      */
     @GetMapping("/carpool/page")
     public Result queryCarpoolByPage(@RequestParam("current") int current) {
-        Page<CarPool> page = carpoolService.query().page(new Page<>(current, DEFAULT_PAGE_SIZE));
+        QueryWrapper<CarPool> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("state", 0); // 只查询状态为有效的拼车信息
+        // 分页查询
+        Page<CarPool> page = carpoolService.page(new Page<>(current, DEFAULT_PAGE_SIZE),queryWrapper);
         return Result.ok(page.getRecords(),page.getTotal());
     }
 
