@@ -4,6 +4,7 @@ import LoginPage from "@/pages/LoginPage"
 import RideListPage from "@/pages/RideListPage"
 import RideDetailPage from "@/pages/RideDetailPage"
 import PublishRidePage from "@/pages/PublishRidePage"
+import AccountPage from "@/pages/AccountPage"
 import ProfilePage from "@/pages/ProfilePage"
 import SearchPage from "@/pages/SearchPage"
 import useAuth from "@/store/auth"
@@ -20,11 +21,12 @@ export default function App() {
       {/* 主内容区域：为底部导航预留空间 pb-24，并限制手机宽度 */}
       <main className="mx-auto max-w-md px-4 pt-4 pb-24">
         <Routes>
-          <Route path="/" element={<RideListPage />} />
-          <Route path="/search" element={<SearchPage />} />
+          <Route path="/" element={<RequireAuth><RideListPage /></RequireAuth>} />
+          <Route path="/search" element={<RequireAuth><SearchPage /></RequireAuth>} />
           {/* 详情页路径修改为 /carpool/:id，对应后端的 carpool 查询 */}
-          <Route path="/carpool/:id" element={<RideDetailPage />} />
+          <Route path="/carpool/:id" element={<RequireAuth><RideDetailPage/></RequireAuth>} />
           <Route path="/publish" element={<RequireAuth><PublishRidePage /></RequireAuth>} />
+          <Route path="/account" element={<RequireAuth><AccountPage /></RequireAuth>} />
           <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
           {/* <Route path="/publish" element={<PublishRidePage />} />
           <Route path="/profile" element={<ProfilePage />} /> */}

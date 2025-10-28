@@ -44,6 +44,7 @@ export interface User {
   schoolName?: string
   gender?: string
   phoneNumber: string
+  userName?: string
 }
 
 /**

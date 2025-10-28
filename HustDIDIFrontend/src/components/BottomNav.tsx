@@ -49,7 +49,7 @@ export default function BottomNav() {
         </NavLink>
 
         <NavLink
-          to="/profile"
+          to="/account"
           className={({ isActive }) => cx(baseItem, isActive ? activeCls : inactiveCls)}
         >
           <User size={20} />

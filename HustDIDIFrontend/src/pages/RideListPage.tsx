@@ -13,7 +13,7 @@ export default function RideListPage() {
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true) // 新增 loading 状态
 
-  const totalPages = Math.ceil(total / 10) || 1
+  const totalPages = Math.ceil(total / 5) || 1
 
   useEffect(() => {
     (async () => {
