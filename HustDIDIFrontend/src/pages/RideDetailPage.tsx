@@ -49,10 +49,10 @@ export default function RideDetailPage() {
       3: 'bg-red-100 text-red-600'
     }
     const textMap: { [key: number]: string } = {
-      0: '待出发',
-      1: '进行中',
-      2: '已完成',
-      3: '已取消'
+      0: '进行中',
+      1: '已完成',
+      2: '已过期',
+      3: '已删除'
     }
     return (
       <span className={`px-3 py-1 text-xs font-semibold rounded-full ${clsMap[state] || 'bg-gray-100'}`}>

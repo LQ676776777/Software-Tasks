@@ -81,7 +81,7 @@ export default function SearchPage() {
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">精确查找</h1>
-            <p className="text-sm text-gray-400 mt-1">输入条件，快速找到你的行程</p>
+            <p className="text-sm text-gray-400 mt-1">输入条件，快速找到你的行程<br></br>（支持模糊搜索）</p>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
