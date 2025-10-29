@@ -48,7 +48,7 @@ export async function updateProfile(payload: {
   schoolName?: string
   gender?: string
 }) {
-  // 假设后端是 PUT /user
+  // 后端是 PUT /user
   const res = await client.put('/user', payload) as any
   return res.data
 }
