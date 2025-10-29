@@ -27,7 +27,11 @@ public class CarPoolController {
     CarpoolService carpoolService;
     @GetMapping("/carpool")
     public Result queryCarpool(){
-        return carpoolService.queryCarpool();
+            return carpoolService.queryCarpool();
+    }
+    @GetMapping("/carpool/mine")
+    public Result queryMyCarpool(HttpSession session){
+        return carpoolService.queryMyCarpool(session);
     }
     @GetMapping("/carpool/{id}")
     public Result queryCarpoolById(@PathVariable Integer id){return carpoolService.queryCarpoolById(id);}
@@ -63,16 +67,6 @@ public class CarPoolController {
      * @param current
      * @return
      */
-/*    @GetMapping("/carpool/matching")
-    public Result queryMatchingCarpool(@RequestParam("startLocation") String startLocation,
-                                       @RequestParam("endLocation") String endLocation,
-                                       @RequestParam("current") int current) {
-        Page<CarPool> page = carpoolService.query()
-                .like("start_place", startLocation)
-                .like("destination", endLocation)
-                .page(new Page<>(current, DEFAULT_PAGE_SIZE));
-        return Result.ok(page.getRecords());
-    }*/
     @GetMapping("/carpool/matching")
     public Result queryMatchingCarpool(@RequestParam("startLocation") String startLocation,
                                        @RequestParam("endLocation") String endLocation,

@@ -21,10 +21,6 @@ public class LoginInterceptor implements HandlerInterceptor {
                              HttpServletResponse response,
                              Object handler) throws Exception {
         HttpSession session = request.getSession(false);
-        System.out.println("请求方法: " + request.getMethod());
-        System.out.println("请求路径: " + request.getRequestURI());
-        System.out.println("请求参数: " + request.getQueryString());
-        System.out.println("请求头: " + request.getHeaderNames());
         if (session == null || session.getAttribute("user") == null) {
             response.setStatus(401);
             response.getWriter().write("please login first");

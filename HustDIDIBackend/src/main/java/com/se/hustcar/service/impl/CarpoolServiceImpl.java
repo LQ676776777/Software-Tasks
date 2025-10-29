@@ -78,4 +78,13 @@ public class CarpoolServiceImpl extends ServiceImpl<CarpoolMapper,CarPool> imple
         return Result.ok(page.getRecords());
     }
 
+    @Override
+    public Result queryMyCarpool(HttpSession session) {
+        Long userId = ((User) session.getAttribute("user")).getId();
+        QueryWrapper<CarPool> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId);
+        List<CarPool> myCarpools = carpoolMapper.selectList(queryWrapper);
+        return Result.ok(myCarpools, (long) myCarpools.size());
+    }
+
 }

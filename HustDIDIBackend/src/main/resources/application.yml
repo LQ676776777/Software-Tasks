@@ -3,9 +3,9 @@ spring:
   application:
     name: "spring-boot-application"
   datasource:
-    url: jdbc:mysql://localhost:3306/cardb
+    url: jdbc:mysql://8.162.1.116:3306/cardb
     username: root
-    password: 1234
+    password: 123321
   servlet:
     multipart:
       max-file-size: 10MB

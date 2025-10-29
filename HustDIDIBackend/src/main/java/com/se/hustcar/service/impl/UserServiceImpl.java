@@ -41,12 +41,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper,User> implements Use
     }
 
     @Override
-    public Result register(User user) {
-        userMapper.insert(user);
-        return Result.ok("用户添加成功");
-    }
-
-    @Override
     public Result login(LoginFormDTO loginForm, HttpSession session) {
         String phone = loginForm.getPhone();
         String code = loginForm.getCode();

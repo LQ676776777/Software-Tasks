@@ -18,7 +18,8 @@ import lombok.Data;
 public class User {
     @TableId(value = "user_id",type= IdType.AUTO)
     private Long id;
+    private String phoneNumber;
     private String schoolName;
     private String gender;
-    private String phoneNumber;
+    private String userName;
 }

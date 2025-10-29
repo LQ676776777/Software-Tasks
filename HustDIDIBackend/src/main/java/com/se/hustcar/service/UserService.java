@@ -20,8 +20,6 @@ public interface UserService extends IService<User> {
 
     Result deleteUser(Integer id);
 
-    Result register(User user);
-
     Result login(LoginFormDTO loginForm, HttpSession session);
 
     Result sendCode(String phone , HttpSession session);

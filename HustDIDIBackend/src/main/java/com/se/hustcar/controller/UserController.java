@@ -20,15 +20,27 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     @Autowired
     UserService userService;
+    //基于Session用户信息查询
+    @GetMapping("/user")
+    public Result getUserInfo(HttpSession session) {
+        return Result.ok(userService.getById(
+                ((User) session.getAttribute("user"))
+                        .getId()));
+    }
     // 用户信息修改
     @PutMapping("/user")
-    public Result updateUserInfo(@RequestBody User user) {
+    public Result updateUserInfo(@RequestBody User user, HttpSession session)
+    {
+        user.setId(((User) session.getAttribute("user"))
+                .getId());
         return userService.updateUserInfo(user);
     }
     // 用户注销
-    @DeleteMapping("/user/{id}")
-    public Result deleteUser(@PathVariable Integer id) {
-        return userService.deleteUser(id);
+    @DeleteMapping("/user")
+    public Result deleteUser(HttpSession session) {
+        long id = ((User) session.getAttribute("user"))
+                .getId();
+        return userService.deleteUser((int)id);
     }
     // 用户登录
     @PostMapping("/login")
