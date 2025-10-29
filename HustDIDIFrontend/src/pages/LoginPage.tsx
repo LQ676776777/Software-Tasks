@@ -12,9 +12,12 @@ export default function LoginPage() {
   const [loadingLogin, setLoadingLogin] = useState(false)
   const [cooldown, setCooldown] = useState(0)
   const [hasSent, setHasSent] = useState(false)
+
   const nav = useNavigate()
   const loc = useLocation()
-  const { setToken /*, fetchProfile*/ } = useAuth()
+
+  // ✅ 这里解构的时候要把 fetchProfile 拿出来
+  const { setToken, fetchProfile } = useAuth()
 
   // 更稳的倒计时：不会出现负数
   useEffect(() => {
@@ -24,17 +27,15 @@ export default function LoginPage() {
   }, [cooldown])
 
   const validPhone = /^1\d{10}$/.test(phone)
-  const validCode = code.length >= 4 // 根据后端实际位数改成 6 也可
+  const validCode = code.length >= 4 // 你后端如果是 6 位，就把 >=4 改成 >=6
 
   const onSend = async () => {
     if (!validPhone) return alert('请输入正确的11位手机号')
     if (cooldown > 0) return
     setLoadingSend(true)
     try {
-      // 关键：sendCode 内部需以查询参数方式发送 (/code?phone=xxx)
       const res = await sendCode(phone) as any
       setHasSent(true)
-      // 如果后端返回 ttl，用返回值；否则退化为 60
       const ttl = typeof res?.ttl === 'number' && res.ttl > 0 ? res.ttl : 60
       setCooldown(ttl)
     } catch (e: any) {
@@ -49,15 +50,19 @@ export default function LoginPage() {
     if (!validPhone || !validCode) return alert('请填写合法的手机号与验证码')
     setLoadingLogin(true)
     try {
-      // 后端是 Session 登录：POST /login { phone, code } 即可
+      // 1. 向后端发起登录
       await loginWithCode(phone, code)
 
-      // 使用占位 token 进入已登录态；鉴权实际靠 session cookie
+      // 2. 标记前端为“已登录”。实际鉴权靠后端 session
       setToken('session')
-      // 如果后端补了 /user/me，可以开启：
-      // await fetchProfile()
 
-      const redirect = (loc.state as any)?.from?.pathname || '/'
+      // 3. 立刻把 /user 的资料拉进全局 store
+      await fetchProfile()
+
+      // 4. 登录后去哪里？
+      //    - 如果是被拦截过来的，回到拦截来源
+      //    - 否则直接去个人主页 /account
+      const redirect = (loc.state as any)?.from?.pathname || '/account'
       nav(redirect, { replace: true })
     } catch (e: any) {
       alert(e?.message || '登录失败')
@@ -69,7 +74,6 @@ export default function LoginPage() {
   const sendBtnText =
     cooldown > 0 ? `${cooldown}s` : hasSent ? '重新发送验证码' : '获取验证码'
 
-  // 允许回车触发登录（可选）
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') onLogin()
   }
@@ -125,8 +129,10 @@ export default function LoginPage() {
                   onClick={onSend}
                   disabled={loadingSend || cooldown > 0}
                   className={`shrink-0 rounded-xl px-4 py-2 text-sm font-semibold transition
-                    ${cooldown>0 ? 'bg-gray-100 text-gray-400 ring-1 ring-gray-200 cursor-not-allowed'
-                                  : 'bg-white text-emerald-600 ring-1 ring-emerald-400 hover:ring-emerald-500 active:ring-2'}`}>
+                    ${cooldown>0
+                      ? 'bg-gray-100 text-gray-400 ring-1 ring-gray-200 cursor-not-allowed'
+                      : 'bg-white text-emerald-600 ring-1 ring-emerald-400 hover:ring-emerald-500 active:ring-2'}`}
+                >
                   {sendBtnText}
                 </button>
               </div>
@@ -146,8 +152,16 @@ export default function LoginPage() {
 
           <div className="pt-2">
             <label className="flex items-center justify-center gap-2 text-xs sm:text-sm text-gray-500">
-              <input type="checkbox" className="w-4 h-4 accent-emerald-500" checked={agree} onChange={e => setAgree(e.target.checked)} />
-              我已阅读并同意 <a className="text-emerald-600 hover:underline" href="/terms" target="_blank" rel="noreferrer">用户协议</a> 和 <a className="text-emerald-600 hover:underline" href="/privacy" target="_blank" rel="noreferrer">隐私政策</a>
+              <input
+                type="checkbox"
+                className="w-4 h-4 accent-emerald-500"
+                checked={agree}
+                onChange={e => setAgree(e.target.checked)}
+              />
+              我已阅读并同意
+              <a className="text-emerald-600 hover:underline" href="/terms" target="_blank" rel="noreferrer">用户协议</a>
+              和
+              <a className="text-emerald-600 hover:underline" href="/privacy" target="_blank" rel="noreferrer">隐私政策</a>
             </label>
           </div>
         </div>

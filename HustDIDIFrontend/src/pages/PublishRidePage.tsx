@@ -69,7 +69,7 @@ export default function PublishRidePage() {
         </div>
 
         <div className="space-y-6">
-          {renderInput('出发地', '例如：东区食堂', 'startPlace')}
+          {renderInput('出发地', '例如：东一食堂', 'startPlace')}
           {renderInput('目的地', '例如：光谷广场', 'destination')}
           {renderInput('出发时间', '', 'dateTime', 'datetime-local')}
         </div>

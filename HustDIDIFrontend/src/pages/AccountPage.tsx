@@ -21,29 +21,35 @@ export default function AccountPage() {
   const totalPages = Math.ceil(total / 5) || 1
 
   // 拉个人信息（如果还没加载过）
-  useEffect(() => {
-    if (!profile) {
-      fetchProfile()
+useEffect(() => {
+  // ✅ 一进页面就尝试刷新个人信息
+  (async () => {
+    try {
+      await fetchProfile()
+    } catch (err) {
+      console.error('fetchProfile 出错', err)
     }
-  }, [profile, fetchProfile])
+  })()
+}, [fetchProfile])
+
 
   // 拉“我发布的拼车单”
-  useEffect(() => {
-    (async () => {
-      setLoadingList(true)
-      try {
-        // 假设后端支持分页参数 current
-        const { items, total } = await listMyRides({ current: page })
-        setItems(items)
-        setTotal(total)
-      } catch (err) {
-        console.error(err)
-        setItems([])
-      } finally {
-        setLoadingList(false)
-      }
-    })()
-  }, [page])
+useEffect(() => {
+  // ✅ 一进页面就查“我发布的拼车”
+  (async () => {
+    setLoadingList(true)
+    try {
+      const { items, total } = await listMyRides({ current: page })
+      setItems(items)
+      setTotal(total)
+    } catch (err) {
+      console.error('listMyRides 出错', err)
+      setItems([])
+    } finally {
+      setLoadingList(false)
+    }
+  })()
+}, [page])
 
   const handleLogout = () => {
     logout()

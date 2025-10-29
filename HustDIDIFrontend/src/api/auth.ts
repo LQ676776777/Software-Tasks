@@ -1,5 +1,7 @@
 import axios from 'axios'
 import client from './client'
+import type { User } from '@/types'
+
 
 // export async function sendCode(phone: string) {
 //   // 方式 A：查询参数（推荐）
@@ -41,7 +43,24 @@ export async function getProfile() {
 /**
  * 更新用户信息。后端通过 PUT /user 接收 User 对象进行更新。
  */
-export async function updateProfile(payload: any) {
+export async function updateProfile(payload: {
+  userName?: string
+  schoolName?: string
+  gender?: string
+}) {
+  // 假设后端是 PUT /user
   const res = await client.put('/user', payload) as any
   return res.data
 }
+
+
+// 根据用户ID获取用户信息
+export async function getUserById(userId: number) {
+  const res = await client.get(`/user/${userId}`) as any
+  // 假设后端返回的是 { success: true, data: { ...User } }
+  return res.data
+}
+
+
+
+
