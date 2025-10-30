@@ -22,6 +22,24 @@ export default function LoginPage() {
   const loc = useLocation()
   const { setToken, fetchProfile } = useAuth()
 
+  const COOLDOWN_KEY = 'sms_cooldown_until' // 过期时间戳(毫秒)
+
+  const setCooldownUntil = (seconds: number) => {
+    const until = Date.now() + seconds * 1000
+    localStorage.setItem(COOLDOWN_KEY, String(until))
+    setCooldown(seconds)
+  }
+
+  const syncCooldownFromStorage = () => {
+    const raw = localStorage.getItem(COOLDOWN_KEY)
+    if (!raw) return
+    const until = Number(raw)
+    const remain = Math.ceil((until - Date.now()) / 1000)
+    if (remain > 0) setCooldown(remain)
+    else localStorage.removeItem(COOLDOWN_KEY)
+  }
+
+
   // 倒计时
   useEffect(() => {
     if (cooldown <= 0) return
@@ -30,42 +48,72 @@ export default function LoginPage() {
   }, [cooldown])
 
   const validPhone = /^1\d{10}$/.test(phone)
-  const validCode = code.length >= 4 // 如果后端要求6位，就 >=6
+  const validCode = code.length === 6 // 如果后端要求6位，就 >=6
   const toast = useToast()
 
+
+  useEffect(() => {
+    syncCooldownFromStorage()
+    // 可选：页面可见性变化时也同步一次，防止后台切回来时间不准
+    const onVis = () => syncCooldownFromStorage()
+    document.addEventListener('visibilitychange', onVis)
+    return () => document.removeEventListener('visibilitychange', onVis)
+  }, [])
+
+
   const onSend = async () => {
-    if (!validPhone) return toast('请输入正确的11位手机号','error')
-    if (cooldown > 0) return
-    setLoadingSend(true)
-    try {
-      const res = await sendCode(phone) as any
-      setHasSent(true)
-      const ttl = typeof res?.ttl === 'number' && res.ttl > 0 ? res.ttl : 60
-      setCooldown(ttl)
-    } catch (e: any) {
-      toast(e?.message || '发送失败','error')
-    } finally {
-      setLoadingSend(false)
-    }
+  if (!validPhone) return toast('请输入正确的11位手机号','error')
+
+  // 本地冷却命中：不打后端
+  if (cooldown > 0) {
+    return toast(`发送过于频繁，请 ${cooldown}s 后再试`, 'error')
   }
+
+  // 乐观开启 60s，本地立即生效，防止连点并发
+  setCooldownUntil(60)
+  setLoadingSend(true)
+  try {
+    const res = await sendCode(phone) as any
+    // 后端可能返回 { ttl: 60 } / { ttl: 43 } 之类
+    const ttl = typeof res?.ttl === 'number' && res.ttl > 0 ? res.ttl : 60
+    setCooldownUntil(ttl)                 // 与后端一致
+    toast('验证码已发送')                  // 默认 success
+  } catch (e: any) {
+    // 如果后端因频率限制报错，可能也会携带剩余秒数
+    const serverTtl =
+      typeof e?.ttl === 'number' && e.ttl > 0
+        ? e.ttl
+        : (typeof e?.response?.data?.ttl === 'number' ? e.response.data.ttl : 0)
+
+    if (serverTtl > 0) {
+      setCooldownUntil(serverTtl)
+      toast(`发送过于频繁，请 ${serverTtl}s 后再试`, 'error')
+    } else {
+      // 真失败：恢复可点，并清掉存储
+      setCooldown(0)
+      localStorage.removeItem(COOLDOWN_KEY)
+      toast(e?.message || '发送失败', 'error')
+    }
+  } finally {
+    setLoadingSend(false)
+  }
+}
+
+
 
   const onLogin = async () => {
     if (!agree) return toast('请先勾选并同意协议','error')
     if (!validPhone || !validCode) return toast('请填写合法的手机号与验证码','error')
     setLoadingLogin(true)
     try {
-      // 1. 登录
-      await loginWithCode(phone, code)
+      await loginWithCode(phone, code)     // 1. 登录
+      setToken('session')                  // 2. 标记已登录
+      await fetchProfile()                 // 3. 拉取资料
 
-      // 2. 标记“已登录”
-      setToken('session')
+      toast('登录成功','success')                   
 
-      // 3. 拉个人资料
-      await fetchProfile()
-
-      // 4. 去 account
       const redirect = (loc.state as any)?.from?.pathname || '/account'
-      nav(redirect, { replace: true })
+      nav(redirect, { replace: true })     // 5. 跳转
     } catch (e: any) {
       toast(e?.message || '登录失败','error')
     } finally {
@@ -73,8 +121,9 @@ export default function LoginPage() {
     }
   }
 
+
   const sendBtnText =
-    cooldown > 0 ? `${cooldown}s` : hasSent ? '重新发送验证码' : '获取验证码'
+    cooldown > 0 ? `${cooldown}s` : hasSent ? '重发验证码' : '获取验证码'
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') onLogin()
