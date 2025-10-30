@@ -121,7 +121,7 @@ const useAuth = create<AuthState>((set, get) => ({
   checkLogin: async () => {
     try {
       const data = await getProfile()
-      set({ profile: data, token: localStorage.getItem('token') || 'session' })
+      set({ profile: data, token: get().token ?? localStorage.getItem('token') ?? null })
     } catch {
       localStorage.removeItem('token')
       set({ token: null, profile: null })

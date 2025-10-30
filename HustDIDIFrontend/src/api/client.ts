@@ -8,7 +8,7 @@ import useAuth from '@/store/auth'
 const client = axios.create({
   baseURL: '/api',        // 走 vite 代理
   timeout: 10000,
-  withCredentials: true,  // ✅ 关键：后端用 Session 登录必须加
+  withCredentials: true,
 })
 
 // ============= 请求拦截器 =============

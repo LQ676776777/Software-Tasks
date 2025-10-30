@@ -106,8 +106,7 @@ export default function LoginPage() {
     if (!validPhone || !validCode) return toast('请填写合法的手机号与验证码','error')
     setLoadingLogin(true)
     try {
-      await loginWithCode(phone, code)     // 1. 登录
-      setToken('session')                  // 2. 标记已登录
+      const res = await loginWithCode(phone, code)
       await fetchProfile()                 // 3. 拉取资料
 
       toast('登录成功','success')                   

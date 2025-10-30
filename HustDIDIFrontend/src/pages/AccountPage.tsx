@@ -9,9 +9,21 @@ import { useNavigate, Link } from 'react-router-dom'
 import dayjs from 'dayjs'
 import { useToast } from '@/components/Toast'
 
+
+
+
+
+
 export default function AccountPage() {
+  
+  const [confirmDialog, setConfirmDialog] = useState<{
+  open: boolean
+  message: string
+  onConfirm: () => void
+}>({ open: false, message: '', onConfirm: () => {} })
   const nav = useNavigate()
   const { profile, fetchProfile, logout } = useAuth()
+  const toast = useToast()
 
   // 我的行程单分页数据
   const [items, setItems] = useState<CarPool[]>([])
@@ -19,6 +31,10 @@ export default function AccountPage() {
   const [page, setPage] = useState(1)
   const [loadingList, setLoadingList] = useState(true)
   const [updatingId, setUpdatingId] = useState<number | null>(null) // 正在修改哪一条
+  const confirmAction = (message: string, onConfirm: () => void) => {
+  setConfirmDialog({ open: true, message, onConfirm })
+}
+
 
   // const totalPages = Math.ceil(total / 5) || 1
 
@@ -84,36 +100,37 @@ export default function AccountPage() {
 
   // --- 操作按钮: 标记为完成 ---
   const markDone = async (rideId: number) => {
-    const toast = useToast()
-    if (!window.confirm('确认把这个行程标记为“已完成”吗？')) return
-    try {
-      setUpdatingId(rideId)
-      await updateRide({ id: rideId, state: 1 })
-      // 更新本地列表，避免整页白闪
-      setItems(prev =>
-        prev.map(r => (r.id === rideId ? { ...r, state: 1 } : r))
-      )
-    } catch (err: any) {
-      toast(err?.message || '操作失败','error')
-    } finally {
-      setUpdatingId(null)
-    }
+
+    confirmAction('确认把这个行程标记为“已完成”吗？', async () => {
+      try {
+        setUpdatingId(rideId)
+        await updateRide({ id: rideId, state: 1 })
+        setItems(prev => prev.map(r => (r.id === rideId ? { ...r, state: 1 } : r)))
+        toast('已标记为完成')
+      } catch (err: any) {
+        toast(err?.message || '操作失败', 'error')
+      } finally {
+        setUpdatingId(null)
+      }
+    })
+
   }
 
   // --- 操作按钮: 删除 ---
   const markDelete = async (rideId: number) => {
-    const toast = useToast()
-    if (!window.confirm('确认删除这个行程吗？删除后乘客将无法看到它。')) return
-    try {
-      setUpdatingId(rideId)
-      await updateRide({ id: rideId, state: 3 })
-      // ✅ 删除成功后，从前端列表移除这条记录
-      setItems(prev => prev.filter(r => r.id !== rideId))
-    } catch (err: any) {
-      toast(err?.message || '操作失败','error')
-    } finally {
-      setUpdatingId(null)
-    }
+    confirmAction('确认删除这个行程吗？删除后乘客将无法看到它。', async () => {
+      try {
+        setUpdatingId(rideId)
+        await updateRide({ id: rideId, state: 3 })
+        setItems(prev => prev.filter(r => r.id !== rideId))
+        toast('已删除')
+      } catch (err: any) {
+        toast(err?.message || '操作失败', 'error')
+      } finally {
+        setUpdatingId(null)
+      }
+    })
+
   }
 
 
@@ -146,6 +163,10 @@ export default function AccountPage() {
             {renderStateBadge(ride.state as number)}
           </div>
         </div>
+
+
+        
+
 
         {/* 操作按钮区 */}
         <div className="mt-4 flex flex-wrap gap-2">
@@ -297,6 +318,36 @@ export default function AccountPage() {
         {items.map(r => (
           <MyRideCard key={r.id} ride={r} />
         ))}
+
+                {confirmDialog.open && (
+          <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4">
+            <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 space-y-5 text-center">
+              <p className="text-gray-800 text-base font-medium leading-relaxed">
+                {confirmDialog.message}
+              </p>
+
+              <div className="flex justify-center gap-4 pt-2">
+                <button
+                  className="px-4 py-2 rounded-xl bg-gray-100 text-gray-600 font-semibold hover:bg-gray-200"
+                  onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
+                >
+                  取消
+                </button>
+
+                <button
+                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold shadow-sm hover:shadow active:opacity-95"
+                  onClick={() => {
+                    confirmDialog.onConfirm()
+                    setConfirmDialog(prev => ({ ...prev, open: false }))
+                  }}
+                >
+                  确认
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
 
       {/* 分页器（固定在底部导航上方）
