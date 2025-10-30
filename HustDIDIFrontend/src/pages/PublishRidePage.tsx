@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { createRide } from '@/api/rides'
 import { useNavigate } from 'react-router-dom'
 import { PenSquare, Send } from 'lucide-react'
+import { useToast } from '@/components/Toast'
 
 export default function PublishRidePage() {
   // 表单字段与后端 CarPool 一致：startPlace, destination, dateTime
@@ -14,6 +15,7 @@ export default function PublishRidePage() {
   })
   const [loading, setLoading] = useState(false)
   const nav = useNavigate()
+  const toast = useToast()
 
   const handleInputChange = (field: keyof typeof form, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }))
@@ -22,16 +24,16 @@ export default function PublishRidePage() {
   const submit = async () => {
     // 简单的前端校验
     if (!form.startPlace || !form.destination || !form.dateTime) {
-      alert('请填写完整的出发地、目的地和出发时间')
+      toast('请填写完整的出发地、目的地和出发时间','error')
       return
     }
     setLoading(true)
     try {
       await createRide(form) // 与后端模型一致
-      alert('发布成功！')
+      toast('发布成功！','success')
       nav('/') // 发布成功后跳转到首页
     } catch (e: any) {
-      alert(e.message || '发布失败')
+      toast(e.message || '发布失败','error')
     } finally {
       setLoading(false)
     }

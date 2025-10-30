@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { loginWithCode, sendCode } from '@/api/auth'
 import useAuth from '@/store/auth'
 import { KeyRound } from 'lucide-react'
+import { useToast } from '@/components/Toast'
 
 export default function LoginPage() {
   const [phone, setPhone] = useState('')
@@ -30,9 +31,10 @@ export default function LoginPage() {
 
   const validPhone = /^1\d{10}$/.test(phone)
   const validCode = code.length >= 4 // 如果后端要求6位，就 >=6
+  const toast = useToast()
 
   const onSend = async () => {
-    if (!validPhone) return alert('请输入正确的11位手机号')
+    if (!validPhone) return toast('请输入正确的11位手机号','error')
     if (cooldown > 0) return
     setLoadingSend(true)
     try {
@@ -41,15 +43,15 @@ export default function LoginPage() {
       const ttl = typeof res?.ttl === 'number' && res.ttl > 0 ? res.ttl : 60
       setCooldown(ttl)
     } catch (e: any) {
-      alert(e?.message || '发送失败')
+      toast(e?.message || '发送失败','error')
     } finally {
       setLoadingSend(false)
     }
   }
 
   const onLogin = async () => {
-    if (!agree) return alert('请先勾选并同意协议')
-    if (!validPhone || !validCode) return alert('请填写合法的手机号与验证码')
+    if (!agree) return toast('请先勾选并同意协议','error')
+    if (!validPhone || !validCode) return toast('请填写合法的手机号与验证码','error')
     setLoadingLogin(true)
     try {
       // 1. 登录
@@ -65,7 +67,7 @@ export default function LoginPage() {
       const redirect = (loc.state as any)?.from?.pathname || '/account'
       nav(redirect, { replace: true })
     } catch (e: any) {
-      alert(e?.message || '登录失败')
+      toast(e?.message || '登录失败','error')
     } finally {
       setLoadingLogin(false)
     }

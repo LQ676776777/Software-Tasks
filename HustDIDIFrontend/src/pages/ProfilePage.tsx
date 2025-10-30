@@ -5,9 +5,11 @@ import useAuth from '@/store/auth'
 import { updateProfile } from '@/api/auth'
 import { UserCircle, Save, ArrowLeft } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useToast } from '@/components/Toast'
 
 export default function ProfilePage() {
   const nav = useNavigate()
+  const toast = useToast()
   const { profile, fetchProfile } = useAuth()
 
   const [form, setForm] = useState({
@@ -44,11 +46,11 @@ export default function ProfilePage() {
     setLoading(true)
     try {
       await updateProfile(form)
-      alert('保存成功')
+      toast('保存成功','success')
       await fetchProfile()
       nav('/account', { replace: true })
     } catch (e: any) {
-      alert(e.message || '保存失败')
+      toast(e.message || '保存失败','error')
     } finally {
       setLoading(false)
     }

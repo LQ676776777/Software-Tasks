@@ -7,6 +7,7 @@ import type { CarPool } from '@/types'
 import { UserCircle, LogOut, Clock, Frown, Car, MapPin, ArrowRight, Calendar, CheckCircle2, Trash2 } from 'lucide-react'
 import { useNavigate, Link } from 'react-router-dom'
 import dayjs from 'dayjs'
+import { useToast } from '@/components/Toast'
 
 export default function AccountPage() {
   const nav = useNavigate()
@@ -83,6 +84,7 @@ export default function AccountPage() {
 
   // --- 操作按钮: 标记为完成 ---
   const markDone = async (rideId: number) => {
+    const toast = useToast()
     if (!window.confirm('确认把这个行程标记为“已完成”吗？')) return
     try {
       setUpdatingId(rideId)
@@ -92,7 +94,7 @@ export default function AccountPage() {
         prev.map(r => (r.id === rideId ? { ...r, state: 1 } : r))
       )
     } catch (err: any) {
-      alert(err?.message || '操作失败')
+      toast(err?.message || '操作失败','error')
     } finally {
       setUpdatingId(null)
     }
@@ -100,6 +102,7 @@ export default function AccountPage() {
 
   // --- 操作按钮: 删除 ---
   const markDelete = async (rideId: number) => {
+    const toast = useToast()
     if (!window.confirm('确认删除这个行程吗？删除后乘客将无法看到它。')) return
     try {
       setUpdatingId(rideId)
@@ -107,7 +110,7 @@ export default function AccountPage() {
       // ✅ 删除成功后，从前端列表移除这条记录
       setItems(prev => prev.filter(r => r.id !== rideId))
     } catch (err: any) {
-      alert(err?.message || '操作失败')
+      toast(err?.message || '操作失败','error')
     } finally {
       setUpdatingId(null)
     }
