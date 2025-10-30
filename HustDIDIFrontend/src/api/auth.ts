@@ -1,4 +1,3 @@
-import axios from 'axios'
 import client from './client'
 import type { User } from '@/types'
 
@@ -12,10 +11,9 @@ import type { User } from '@/types'
 // }
 
 export async function sendCode(phone: string) {
-  const form = new URLSearchParams({ phone })
-  return axios.post('/api/code', form, {
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-  })
+  // 后端接口要求通过查询参数传递手机号，因此这里直接用 client 发请求，并附带 params
+  // 使用 client 而非独立的 axios，可以复用统一的 baseURL 和拦截器
+  return client.post('/code', null, { params: { phone } })
 }
 
 

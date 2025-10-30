@@ -106,13 +106,21 @@ export default function LoginPage() {
     if (!validPhone || !validCode) return toast('请填写合法的手机号与验证码','error')
     setLoadingLogin(true)
     try {
-      const res = await loginWithCode(phone, code)
-      await fetchProfile()                 // 3. 拉取资料
+      // 调用后端登录接口
+      await loginWithCode(phone, code)
+      // 登录成功后，用手机号或固定字符串作为标识写入 token，以兼容后端基于 session 的登录机制
+      setToken(phone || 'session')
+      // 尝试拉取用户资料。若后端未提供相关接口，错误会被内部捕获并忽略
+      try {
+        await fetchProfile()
+      } catch (_) {
+        // 忽略资料获取失败，它不会阻止登录流程
+      }
 
-      toast('登录成功','success')                   
-
+      toast('登录成功','success')
+      // 成功后跳转到原页面或个人主页
       const redirect = (loc.state as any)?.from?.pathname || '/account'
-      nav(redirect, { replace: true })     // 5. 跳转
+      nav(redirect, { replace: true })
     } catch (e: any) {
       toast(e?.message || '登录失败','error')
     } finally {

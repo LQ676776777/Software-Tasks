@@ -130,6 +130,10 @@ export default function SearchPage() {
     </div>
   )
 
+  const hasQuery = startLocation.trim() || endLocation.trim()
+  const showingFrom = (page - 1) * PAGE_SIZE + (items.length ? 1 : 0)
+  const showingTo = (page - 1) * PAGE_SIZE + items.length
+
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-6 pb-32">
       {/* 搜索面板（保留你原来的样式） */}
@@ -140,16 +144,21 @@ export default function SearchPage() {
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">精确查找</h1>
-            <p className="text-sm text-gray-400 mt-1">输入条件，快速找到你的行程（支持模糊搜索）</p>
+            {/* 换行显示“支持模糊搜索” */}
+            <p className="text-sm text-gray-400 mt-1">
+              输入条件，快速找到你的行程
+              <span className="block">（支持模糊搜索）</span>
+            </p>
           </div>
         </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
           <div className="group">
             <label className="block text-sm text-gray-400 mb-1 group-focus-within:text-emerald-600 transition-colors">出发地</label>
             <div className="border-b border-gray-200 focus-within:border-emerald-500 transition-all">
               <input
                 className="w-full bg-transparent outline-none text-base text-gray-900 caret-emerald-500 py-2 placeholder:text-gray-400"
-                placeholder="例如：东区食堂"
+                placeholder="例如：东一食堂"
                 value={startLocation}
                 onChange={(e) => { setStartLocation(e.target.value); setPage(1) }}
               />
@@ -167,13 +176,32 @@ export default function SearchPage() {
             </div>
           </div>
         </div>
+
+        {/* 结果计数（含当前显示范围） */}
+        {hasQuery && (
+          <div className="mt-4 text-sm text-gray-500">
+            {loading ? (
+              <span>正在检索中…</span>
+            ) : (
+              <span>
+                共找到 <span className="font-semibold text-gray-700">{total}</span> 条结果
+                {total > 0 && (
+                  <>
+                    ，当前显示第 <span className="font-semibold text-gray-700">{showingFrom}</span>
+                    -<span className="font-semibold text-gray-700">{showingTo}</span> 条
+                  </>
+                )}
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* 列表区域（样式与列表页一致） */}
       <div className="space-y-4">
         {loading && <div className="text-center text-gray-500 py-8">正在加载中...</div>}
 
-        {!loading && items.length === 0 && (startLocation || endLocation) && (
+        {!loading && items.length === 0 && hasQuery && (
           <div className="text-center text-gray-400 py-12 flex flex-col items-center gap-4">
             <Frown className="w-16 h-16 text-gray-300" />
             <span>没有找到符合条件的拼车单</span>

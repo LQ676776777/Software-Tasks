@@ -114,18 +114,37 @@ const useAuth = create<AuthState>((set, get) => ({
   // },
 
     fetchProfile: async () => {
-    const data = await getProfile()      // GET /user
-    set({ profile: data })
+    // 为兼容没有 GET /user 接口的后端，这里尝试调用 getProfile，但忽略异常。
+    try {
+      const data = await getProfile() // 尝试向后端拉取当前用户信息
+      set({ profile: data })
+    } catch (err) {
+      // 如果接口不存在或报错，不更新 profile，以免影响登录状态
+      console.error('fetchProfile error', err)
+      // 如果当前 token 看起来是手机号，则构造一个基本的 profile，让 UI 至少能展示手机号
+      const tokenStr = localStorage.getItem('token') || ''
+      let fallback: Profile | null = null
+      if (/^1\d{10}$/.test(tokenStr)) {
+        fallback = { phoneNumber: tokenStr }
+      }
+      set({ profile: fallback })
+    }
   },
 
   checkLogin: async () => {
+    // 基于本地 token 判断是否已登录。如果没有 token，直接抛出未登录错误。
+    const currentToken = get().token ?? localStorage.getItem('token') ?? null
+    if (!currentToken) {
+      throw new Error('unauthed')
+    }
+    // 如果有 token，可尝试刷新用户信息，但即便失败也不影响登录态
     try {
       const data = await getProfile()
-      set({ profile: data, token: get().token ?? localStorage.getItem('token') ?? null })
-    } catch {
-      localStorage.removeItem('token')
-      set({ token: null, profile: null })
-      throw new Error('unauthed')
+      set({ profile: data, token: currentToken })
+    } catch (err) {
+      console.warn('checkLogin: cannot fetch profile', err)
+      // 保留现有 token，profile 保持不变
+      set({ token: currentToken })
     }
   }
 }))

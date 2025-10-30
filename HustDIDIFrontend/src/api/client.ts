@@ -8,7 +8,6 @@ import useAuth from '@/store/auth'
 const client = axios.create({
   baseURL: '/api',        // 走 vite 代理
   timeout: 10000,
-  withCredentials: true,
 })
 
 // ============= 请求拦截器 =============
@@ -50,17 +49,22 @@ client.interceptors.response.use(
 
     const toast = useToast()
 
-    if (status === 401) msg = '未登录或登录已过期'
-    {
+    // 根据状态码处理不同的错误提示和逻辑
+    if (status === 401) {
+      msg = '未登录或登录已过期'
+      // 只有在未登录时才需要清空登录状态并跳转
       const { logout } = useAuth.getState()
       logout()
       toast?.('登录已过期，请重新登录', 'error')
-      // 可选：跳转
+      // 可选：跳转回登录页
       window.location.href = '/login'
+    } else if (status === 403) {
+      msg = '无权限访问'
+    } else if (status === 404) {
+      msg = '接口不存在'
+    } else if (status >= 500) {
+      msg = '服务器错误'
     }
-    if (status === 403) msg = '无权限访问'
-    if (status === 404) msg = '接口不存在'
-    if (status >= 500) msg = '服务器错误'
 
     return Promise.reject(new Error(msg))
   }

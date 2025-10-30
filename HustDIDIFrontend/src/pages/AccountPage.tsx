@@ -15,15 +15,15 @@ import { useToast } from '@/components/Toast'
 
 
 export default function AccountPage() {
-  
+  const nav = useNavigate()
+  const { profile, fetchProfile, logout } = useAuth()
+  const toast = useToast()
+
   const [confirmDialog, setConfirmDialog] = useState<{
   open: boolean
   message: string
   onConfirm: () => void
 }>({ open: false, message: '', onConfirm: () => {} })
-  const nav = useNavigate()
-  const { profile, fetchProfile, logout } = useAuth()
-  const toast = useToast()
 
   // 我的行程单分页数据
   const [items, setItems] = useState<CarPool[]>([])
@@ -106,7 +106,7 @@ export default function AccountPage() {
         setUpdatingId(rideId)
         await updateRide({ id: rideId, state: 1 })
         setItems(prev => prev.map(r => (r.id === rideId ? { ...r, state: 1 } : r)))
-        toast('已标记为完成')
+        toast('已标记为完成','success')
       } catch (err: any) {
         toast(err?.message || '操作失败', 'error')
       } finally {
