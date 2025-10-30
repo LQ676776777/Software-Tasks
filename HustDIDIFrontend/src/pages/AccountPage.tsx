@@ -20,7 +20,7 @@ export default function AccountPage() {
   const [loadingList, setLoadingList] = useState(true)
   const [updatingId, setUpdatingId] = useState<number | null>(null) // 正在修改哪一条
 
-  const totalPages = Math.ceil(total / 5) || 1
+  // const totalPages = Math.ceil(total / 5) || 1
 
   // 进页面拉个人信息
   useEffect(() => {
@@ -299,7 +299,7 @@ export default function AccountPage() {
         ))}
       </div>
 
-      {/* 分页器（固定在底部导航上方） */}
+      {/* 分页器（固定在底部导航上方）
       {total > 0 && (
         <div className="fixed bottom-16 left-0 right-0 flex justify-center items-center gap-2 bg-white/80 backdrop-blur-sm border-t py-3 px-4">
           <button
@@ -320,7 +320,7 @@ export default function AccountPage() {
             下一页
           </button>
         </div>
-      )}
+      )} */}
     </div>
   )
 }

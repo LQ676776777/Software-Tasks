@@ -72,6 +72,7 @@ interface AuthState {
   setToken: (token: string | null) => void
   logout: () => void
   fetchProfile: () => Promise<void>
+  checkLogin: () => Promise<void>
 }
 
 const useAuth = create<AuthState>((set, get) => ({
@@ -100,17 +101,33 @@ const useAuth = create<AuthState>((set, get) => ({
     })
   },
 
-  // 🔥 关键：向后端拿 /user 并更新全局 profile
-  fetchProfile: async () => {
-    try {
-      const data = await getProfile() // axios GET /user
-      set({ profile: data })
-    } catch (err) {
-      console.error('fetchProfile 失败: ', err)
-      // 401 / 未登录 之类的情况，稳妥做法是清空本地态
-      set({ profile: null })
-    }
+  // 关键：向后端拿 /user 并更新全局 profile
+  // fetchProfile: async () => {
+  //   try {
+  //     const data = await getProfile() // axios GET /user
+  //     set({ profile: data })
+  //   } catch (err) {
+  //     console.error('fetchProfile 失败: ', err)
+  //     // 401 / 未登录 之类的情况，稳妥做法是清空本地态
+  //     set({ profile: null })
+  //   }
+  // },
+
+    fetchProfile: async () => {
+    const data = await getProfile()      // GET /user
+    set({ profile: data })
   },
+
+  checkLogin: async () => {
+    try {
+      const data = await getProfile()
+      set({ profile: data, token: localStorage.getItem('token') || 'session' })
+    } catch {
+      localStorage.removeItem('token')
+      set({ token: null, profile: null })
+      throw new Error('unauthed')
+    }
+  }
 }))
 
 export default useAuth

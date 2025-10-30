@@ -21,7 +21,7 @@ export async function listRides(q: { current?: number } = {}) {
  * 根据起止地点查询拼车信息（模糊匹配）。
  * 后端接口为 /carpool/matching?startLocation=xxx&endLocation=yyy&current=1
  */
-export async function searchRides(q: { startLocation: string; endLocation: string; current?: number }) {
+export async function searchRides(q: { startLocation: string; endLocation: string; current?: number; size?: number}) {
   const { startLocation, endLocation } = q
   const current = q.current ?? 1
   const res = await client.get('/carpool/matching', { params: { startLocation, endLocation, current } }) as any

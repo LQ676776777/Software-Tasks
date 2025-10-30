@@ -2,6 +2,8 @@
 import axios from 'axios'
 import type { Result } from './result'
 import { isOk, getMessage } from './result'
+import { useToast } from '@/components/Toast'
+import useAuth from '@/store/auth'
 
 const client = axios.create({
   baseURL: '/api',        // 走 vite 代理
@@ -46,7 +48,16 @@ client.interceptors.response.use(
       err?.message ||
       '网络错误'
 
+    const toast = useToast()
+
     if (status === 401) msg = '未登录或登录已过期'
+    {
+      const { logout } = useAuth.getState()
+      logout()
+      toast?.('登录已过期，请重新登录', 'error')
+      // 可选：跳转
+      window.location.href = '/login'
+    }
     if (status === 403) msg = '无权限访问'
     if (status === 404) msg = '接口不存在'
     if (status >= 500) msg = '服务器错误'

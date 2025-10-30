@@ -77,7 +77,7 @@ export default function LoginPage() {
     // 后端可能返回 { ttl: 60 } / { ttl: 43 } 之类
     const ttl = typeof res?.ttl === 'number' && res.ttl > 0 ? res.ttl : 60
     setCooldownUntil(ttl)                 // 与后端一致
-    toast('验证码已发送')                  // 默认 success
+    toast('验证码已发送','success')                  // 默认 success
   } catch (e: any) {
     // 如果后端因频率限制报错，可能也会携带剩余秒数
     const serverTtl =
