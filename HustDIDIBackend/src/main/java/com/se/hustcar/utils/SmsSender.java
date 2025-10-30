@@ -18,7 +18,7 @@ import java.util.Map;
  * @Veision 1.0
  */
 public class SmsSender {
-    public static void sendCodeUtil(String code, String phone) {
+    public static boolean sendCodeUtil(String code, String phone) {
         String url = "https://push.spug.cc/send/zk9qMjwAg98BRgQp";
         Map<String, Object> body = new HashMap<>();
         body.put("key1", "Hust滴滴");
@@ -33,8 +33,6 @@ public class SmsSender {
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
         // 发送POST请求
         ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
-
-        System.out.println("状态码：" + response.getStatusCode());
-        System.out.println("响应内容：" + response.getBody());
+        return response.getStatusCode().is2xxSuccessful();
     }
 }

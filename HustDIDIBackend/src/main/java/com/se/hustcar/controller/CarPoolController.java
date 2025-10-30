@@ -46,7 +46,9 @@ public class CarPoolController {
      */
     @PutMapping("/carpool")
     public Result updateCarpool(@RequestBody CarPool carPool) {
-        return carpoolService.updateCarpool(carPool);
+        return Result.ok(carpoolService.update().set("state", carPool.getState())
+                .eq("trade_id", carPool.getId())
+                .update());
     }
     /**
      * 分页查询拼车信息
@@ -55,6 +57,7 @@ public class CarPoolController {
     public Result queryCarpoolByPage(@RequestParam("current") int current) {
         QueryWrapper<CarPool> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("state", 0); // 只查询状态为有效的拼车信息
+        queryWrapper.orderByDesc("date_time"); // 按创建时间降序排序
         // 分页查询
         Page<CarPool> page = carpoolService.page(new Page<>(current, DEFAULT_PAGE_SIZE),queryWrapper);
         return Result.ok(page.getRecords(),page.getTotal());

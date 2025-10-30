@@ -60,12 +60,6 @@ public class CarpoolServiceImpl extends ServiceImpl<CarpoolMapper,CarPool> imple
     }
 
     @Override
-    public Result updateCarpool(CarPool carPool) {
-        carpoolMapper.updateById(carPool);
-        return Result.ok("拼车请求更新成功！");
-    }
-
-    @Override
     public Result queryCarpoolByMatching(String startLocation, String endLocation, int current) {
         String normalizedStart = PlaceNormalizer.normalize(startLocation);
         String normalizedEnd = PlaceNormalizer.normalize(endLocation);
@@ -73,9 +67,11 @@ public class CarpoolServiceImpl extends ServiceImpl<CarpoolMapper,CarPool> imple
         Page<CarPool> page = this.query()
                 .like("normalized_start_place", normalizedStart)
                 .like("normalized_destination", normalizedEnd)
+                .eq("state",0)
+                .orderByDesc("date_time")
                 .page(new Page<>(current, DEFAULT_PAGE_SIZE));
 
-        return Result.ok(page.getRecords());
+        return Result.ok(page.getRecords(),page.getTotal());
     }
 
     @Override
@@ -83,6 +79,7 @@ public class CarpoolServiceImpl extends ServiceImpl<CarpoolMapper,CarPool> imple
         Long userId = ((User) session.getAttribute("user")).getId();
         QueryWrapper<CarPool> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", userId);
+        queryWrapper.ne("state", 3); // 排除已删除的拼车信息
         List<CarPool> myCarpools = carpoolMapper.selectList(queryWrapper);
         return Result.ok(myCarpools, (long) myCarpools.size());
     }

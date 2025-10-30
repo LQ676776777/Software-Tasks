@@ -7,3 +7,11 @@
 基于Elasticsearch的IK分词器，实现了进一步的搜索功能，包括**聚合搜索**和**模糊匹配**
 
 使用Kafka中间件，保证Elasticsearch和MySQL数据库的**最终一致性**
+
+
+
+测试：
+
+使用jmeter测试接口
+
+/code发送验证码接口：QPS可以达到2000

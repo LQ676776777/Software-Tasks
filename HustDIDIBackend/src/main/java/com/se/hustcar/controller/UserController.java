@@ -20,6 +20,10 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     @Autowired
     UserService userService;
+    @GetMapping("/user/{id}")
+    public Result getUserById(@PathVariable Integer id) {
+        return Result.ok(userService.getById(id));
+    }
     //基于Session用户信息查询
     @GetMapping("/user")
     public Result getUserInfo(HttpSession session) {

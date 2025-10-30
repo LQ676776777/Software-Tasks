@@ -21,8 +21,6 @@ public interface CarpoolService extends IService<CarPool> {
 
     Result addCarpool(CarPool carPool, HttpSession session);
 
-    Result updateCarpool(CarPool carPool);
-
     Result queryCarpoolByMatching(String startLocation, String endLocation, int current) ;
 
     Result queryMyCarpool(HttpSession session);

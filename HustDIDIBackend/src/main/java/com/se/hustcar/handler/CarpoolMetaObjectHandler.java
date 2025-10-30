@@ -30,6 +30,7 @@ public class CarpoolMetaObjectHandler implements MetaObjectHandler {
 
     @Override
     public void updateFill(MetaObject metaObject) {
+        if(metaObject==null)return;
         Object startPlace = getFieldValByName("startPlace", metaObject);
         Object destination = getFieldValByName("destination", metaObject);
 
