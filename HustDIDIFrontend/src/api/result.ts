@@ -1,31 +1,47 @@
-
-export type Result<T=any> = {
-  code?: number;              // e.g. 0 / 200 for success
-  status?: number | string;   // some backends use 'status'
-  success?: boolean;          // some backends use boolean success
-  message?: string;
-  msg?: string;
-  data: T;
-  // extra: timestamp, requestId, etc. will be preserved on response.data
-  [k: string]: any;
+// src/api/result.ts
+/**
+ * 通用的后端响应类型定义。
+ *
+ * 后端统一返回 Result 对象，包含：
+ *  - success: 标识请求是否成功
+ *  - errorMsg: 失败时的错误描述
+ *  - data: 返回的业务数据，可以是单个对象或数组
+ *  - total: 当 data 为列表时返回的总条数，用于分页
+ *  其余属性会被原样保留，方便后续扩展。
+ */
+export type Result<T = any> = {
+  success: boolean
+  errorMsg?: string
+  data: T
+  total?: number
+  [k: string]: any
 }
 
-/** Determine success from flexible backend */
+/** 判断响应是否成功 */
 export function isOk(res: Result<any>): boolean {
-  if (typeof res.success === 'boolean') return res.success
-  if (typeof res.code === 'number') return res.code === 0 || res.code === 200
-  if (typeof res.status === 'number') return res.status === 0 || res.status === 200
-  if (typeof res.status === 'string') return res.status.toLowerCase() === 'ok' || res.status === '200'
-  // default optimistic only if data exists
-  return !!res.data
+  return !!res && res.success === true
 }
 
+/** 提取错误消息，默认为空字符串 */
 export function getMessage(res: Result<any>): string {
-  return res.message || res.msg || ''
+  return res.errorMsg || ''
 }
 
-// Normalize page data: works with {total, items} | {total, list} | {count, rows} | array
-export function normalizePageData<T=any>(data: any) {
+/**
+ * 将包含 Result 的分页结果格式化为 { total, items }。
+ * 如果传入的对象具备 data/total 字段，则优先使用；
+ * 否则兼容旧逻辑，直接处理传入的 data 本身。
+ */
+export function normalizePageData<T = any>(resp: Result<any> | any) {
+  // 当传入的是整个响应时，从中获取 data 和 total
+  if (resp && typeof resp === 'object' && 'data' in resp) {
+    const arr = resp.data as any
+    const total = resp.total ?? (Array.isArray(arr) ? arr.length : 0)
+    const items = Array.isArray(arr) ? arr : []
+    return { total, items: items as T[] }
+  }
+  // 兼容传入的是数据本身的情况
+  const data = resp as any
   if (!data) return { total: 0, items: [] as T[] }
   if (Array.isArray(data)) return { total: data.length, items: data as T[] }
   const total = data.total ?? data.totalCount ?? data.count ?? data.recordsTotal ?? 0
