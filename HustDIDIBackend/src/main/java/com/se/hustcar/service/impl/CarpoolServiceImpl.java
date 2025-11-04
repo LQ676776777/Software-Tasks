@@ -80,6 +80,7 @@ public class CarpoolServiceImpl extends ServiceImpl<CarpoolMapper,CarPool> imple
         QueryWrapper<CarPool> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", userId);
         queryWrapper.ne("state", 3); // 排除已删除的拼车信息
+        queryWrapper.orderByDesc("id"); // 按id降序排序
         List<CarPool> myCarpools = carpoolMapper.selectList(queryWrapper);
         return Result.ok(myCarpools, (long) myCarpools.size());
     }

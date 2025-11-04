@@ -10,9 +10,9 @@
     </parent>
     <groupId>com.se</groupId>
     <artifactId>HustDIDIBackend</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>HustCar</name>
-    <description>HustCar</description>
+    <version>0.0.2</version>
+    <name>HustDIDI</name>
+    <description>HustDIDI</description>
     <url/>
     <licenses>
         <license/>
