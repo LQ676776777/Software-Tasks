@@ -6,9 +6,9 @@ import { useToast } from '@/components/Toast'
 import useAuth from '@/store/auth'
 
 const client = axios.create({
-  baseURL: '/api',        // 走 vite 代理
+  baseURL: '/api',                
   timeout: 10000,
-})
+});
 
 // ============= 请求拦截器 =============
 client.interceptors.request.use((cfg) => {
