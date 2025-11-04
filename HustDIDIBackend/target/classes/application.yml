@@ -1,0 +1,18 @@
+
+spring:
+  application:
+    name: "spring-boot-application"
+  datasource:
+    url: jdbc:mysql://8.162.1.116:3306/cardb
+    username: root
+    password: 123321
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.commons.JakartaCommonsLoggingImpl
+    map-underscore-to-camel-case: true
+server:
+  port: 9000

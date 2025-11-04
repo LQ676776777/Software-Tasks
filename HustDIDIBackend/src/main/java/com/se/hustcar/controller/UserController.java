@@ -1,0 +1,64 @@
+package com.se.hustcar.controller;
+
+import com.se.hustcar.domain.dto.LoginFormDTO;
+import com.se.hustcar.domain.pojo.Result;
+import com.se.hustcar.domain.pojo.User;
+import com.se.hustcar.service.UserService;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * ClassName: UserController
+ * Description:
+ *
+ * @Auther KuoZ
+ * @Create 2025/10/21 13:56
+ * @Veision 1.0
+ */
+@RestController
+public class UserController {
+    @Autowired
+    UserService userService;
+    @GetMapping("/user/{id}")
+    public Result getUserById(@PathVariable Integer id) {
+        return Result.ok(userService.getById(id));
+    }
+    //基于Session用户信息查询
+    @GetMapping("/user")
+    public Result getUserInfo(HttpSession session) {
+        return Result.ok(userService.getById(
+                ((User) session.getAttribute("user"))
+                        .getId()));
+    }
+    // 用户信息修改
+    @PutMapping("/user")
+    public Result updateUserInfo(@RequestBody User user, HttpSession session)
+    {
+        user.setId(((User) session.getAttribute("user"))
+                .getId());
+        return userService.updateUserInfo(user);
+    }
+    // 用户注销
+    @DeleteMapping("/user")
+    public Result deleteUser(HttpSession session) {
+        long id = ((User) session.getAttribute("user"))
+                .getId();
+        return userService.deleteUser((int)id);
+    }
+    // 用户登录
+    @PostMapping("/login")
+    public Result login(@RequestBody LoginFormDTO loginForm, HttpSession session) {
+        return userService.login(loginForm,session);
+    }
+    //发送验证码
+    @PostMapping("/code")
+    public Result sendCode(@RequestParam ("phone") String phone,HttpSession session) {
+        return userService.sendCode(phone, session);
+    }
+    //退出登录
+    @PostMapping("/logout")
+    public Result logout(HttpSession session) {
+        return userService.logout(session);
+    }
+}
